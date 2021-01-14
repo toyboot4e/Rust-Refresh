@@ -82,6 +82,24 @@ pub const REFRESH_PATCH_VERSION: u32 = 0;
 pub type size_t = ::std::os::raw::c_ulong;
 pub type wchar_t = ::std::os::raw::c_int;
 pub type max_align_t = u128;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VkInstance_T {
+    _unused: [u8; 0],
+}
+pub type VkInstance = *mut VkInstance_T;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VkDevice_T {
+    _unused: [u8; 0],
+}
+pub type VkDevice = *mut VkDevice_T;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VkPhysicalDevice_T {
+    _unused: [u8; 0],
+}
+pub type VkPhysicalDevice = *mut VkPhysicalDevice_T;
 pub type int_least8_t = i8;
 pub type int_least16_t = i16;
 pub type int_least32_t = i32;
@@ -2500,39 +2518,6 @@ impl Default for Refresh_ShaderStageState {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct Refresh_TopologyState {
-    pub topology: Refresh_PrimitiveType,
-}
-#[test]
-fn bindgen_test_layout_Refresh_TopologyState() {
-    assert_eq!(
-        ::std::mem::size_of::<Refresh_TopologyState>(),
-        4usize,
-        concat!("Size of: ", stringify!(Refresh_TopologyState))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<Refresh_TopologyState>(),
-        4usize,
-        concat!("Alignment of ", stringify!(Refresh_TopologyState))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Refresh_TopologyState>())).topology as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Refresh_TopologyState),
-            "::",
-            stringify!(topology)
-        )
-    );
-}
-impl Default for Refresh_TopologyState {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct Refresh_ViewportState {
     pub viewports: *const Refresh_Viewport,
     pub viewportCount: u32,
@@ -3083,7 +3068,7 @@ pub struct Refresh_GraphicsPipelineCreateInfo {
     pub vertexShaderState: Refresh_ShaderStageState,
     pub fragmentShaderState: Refresh_ShaderStageState,
     pub vertexInputState: Refresh_VertexInputState,
-    pub topologyState: Refresh_TopologyState,
+    pub primitiveType: Refresh_PrimitiveType,
     pub viewportState: Refresh_ViewportState,
     pub rasterizerState: Refresh_RasterizerState,
     pub multisampleState: Refresh_MultisampleState,
@@ -3148,7 +3133,7 @@ fn bindgen_test_layout_Refresh_GraphicsPipelineCreateInfo() {
     );
     assert_eq!(
         unsafe {
-            &(*(::std::ptr::null::<Refresh_GraphicsPipelineCreateInfo>())).topologyState as *const _
+            &(*(::std::ptr::null::<Refresh_GraphicsPipelineCreateInfo>())).primitiveType as *const _
                 as usize
         },
         80usize,
@@ -3156,7 +3141,7 @@ fn bindgen_test_layout_Refresh_GraphicsPipelineCreateInfo() {
             "Offset of field: ",
             stringify!(Refresh_GraphicsPipelineCreateInfo),
             "::",
-            stringify!(topologyState)
+            stringify!(primitiveType)
         )
     );
     assert_eq!(
@@ -3360,6 +3345,183 @@ impl Default for Refresh_FramebufferCreateInfo {
         unsafe { ::std::mem::zeroed() }
     }
 }
+pub const Refresh_SysRendererType_REFRESH_RENDERER_TYPE_VULKAN: Refresh_SysRendererType = 0;
+pub type Refresh_SysRendererType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Refresh_SysRenderer {
+    pub rendererType: Refresh_SysRendererType,
+    pub renderer: Refresh_SysRenderer__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union Refresh_SysRenderer__bindgen_ty_1 {
+    pub filler: [u8; 64usize],
+    _bindgen_union_align: [u8; 64usize],
+}
+#[test]
+fn bindgen_test_layout_Refresh_SysRenderer__bindgen_ty_1() {
+    assert_eq!(
+        ::std::mem::size_of::<Refresh_SysRenderer__bindgen_ty_1>(),
+        64usize,
+        concat!("Size of: ", stringify!(Refresh_SysRenderer__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Refresh_SysRenderer__bindgen_ty_1>(),
+        1usize,
+        concat!(
+            "Alignment of ",
+            stringify!(Refresh_SysRenderer__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_SysRenderer__bindgen_ty_1>())).filler as *const _
+                as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_SysRenderer__bindgen_ty_1),
+            "::",
+            stringify!(filler)
+        )
+    );
+}
+impl Default for Refresh_SysRenderer__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[test]
+fn bindgen_test_layout_Refresh_SysRenderer() {
+    assert_eq!(
+        ::std::mem::size_of::<Refresh_SysRenderer>(),
+        68usize,
+        concat!("Size of: ", stringify!(Refresh_SysRenderer))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Refresh_SysRenderer>(),
+        4usize,
+        concat!("Alignment of ", stringify!(Refresh_SysRenderer))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_SysRenderer>())).rendererType as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_SysRenderer),
+            "::",
+            stringify!(rendererType)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Refresh_SysRenderer>())).renderer as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_SysRenderer),
+            "::",
+            stringify!(renderer)
+        )
+    );
+}
+impl Default for Refresh_SysRenderer {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Refresh_TextureHandles {
+    pub rendererType: Refresh_SysRendererType,
+    pub texture: Refresh_TextureHandles__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union Refresh_TextureHandles__bindgen_ty_1 {
+    pub filler: [u8; 64usize],
+    _bindgen_union_align: [u8; 64usize],
+}
+#[test]
+fn bindgen_test_layout_Refresh_TextureHandles__bindgen_ty_1() {
+    assert_eq!(
+        ::std::mem::size_of::<Refresh_TextureHandles__bindgen_ty_1>(),
+        64usize,
+        concat!(
+            "Size of: ",
+            stringify!(Refresh_TextureHandles__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Refresh_TextureHandles__bindgen_ty_1>(),
+        1usize,
+        concat!(
+            "Alignment of ",
+            stringify!(Refresh_TextureHandles__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureHandles__bindgen_ty_1>())).filler as *const _
+                as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureHandles__bindgen_ty_1),
+            "::",
+            stringify!(filler)
+        )
+    );
+}
+impl Default for Refresh_TextureHandles__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[test]
+fn bindgen_test_layout_Refresh_TextureHandles() {
+    assert_eq!(
+        ::std::mem::size_of::<Refresh_TextureHandles>(),
+        68usize,
+        concat!("Size of: ", stringify!(Refresh_TextureHandles))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Refresh_TextureHandles>(),
+        4usize,
+        concat!("Alignment of ", stringify!(Refresh_TextureHandles))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureHandles>())).rendererType as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureHandles),
+            "::",
+            stringify!(rendererType)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Refresh_TextureHandles>())).texture as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureHandles),
+            "::",
+            stringify!(texture)
+        )
+    );
+}
+impl Default for Refresh_TextureHandles {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
 extern "C" {
     pub fn Refresh_LinkedVersion() -> u32;
 }
@@ -3375,6 +3537,12 @@ extern "C" {
 extern "C" {
     pub fn Refresh_CreateDevice(
         presentationParameters: *mut Refresh_PresentationParameters,
+        debugMode: u8,
+    ) -> *mut Refresh_Device;
+}
+extern "C" {
+    pub fn Refresh_CreateDeviceUsingExternal(
+        sysRenderer: *mut Refresh_SysRenderer,
         debugMode: u8,
     ) -> *mut Refresh_Device;
 }
@@ -3398,13 +3566,9 @@ extern "C" {
         device: *mut Refresh_Device,
         commandBuffer: *mut Refresh_CommandBuffer,
         baseVertex: u32,
-        minVertexIndex: u32,
-        numVertices: u32,
         startIndex: u32,
         primitiveCount: u32,
         instanceCount: u32,
-        indices: *mut Refresh_Buffer,
-        indexElementSize: Refresh_IndexElementSize,
         vertexParamOffset: u32,
         fragmentParamOffset: u32,
     );
@@ -3414,12 +3578,8 @@ extern "C" {
         device: *mut Refresh_Device,
         commandBuffer: *mut Refresh_CommandBuffer,
         baseVertex: u32,
-        minVertexIndex: u32,
-        numVertices: u32,
         startIndex: u32,
         primitiveCount: u32,
-        indices: *mut Refresh_Buffer,
-        indexElementSize: Refresh_IndexElementSize,
         vertexParamOffset: u32,
         fragmentParamOffset: u32,
     );
@@ -3768,6 +3928,13 @@ extern "C" {
 }
 extern "C" {
     pub fn Refresh_Wait(device: *mut Refresh_Device);
+}
+extern "C" {
+    pub fn Refresh_GetTextureHandles(
+        device: *mut Refresh_Device,
+        texture: *mut Refresh_Texture,
+        handles: *mut Refresh_TextureHandles,
+    );
 }
 pub type __builtin_va_list = [__va_list_tag; 1usize];
 #[repr(C)]
