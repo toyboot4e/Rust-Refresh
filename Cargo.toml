@@ -1,0 +1,12 @@
+[package]
+name = "refresh"
+version = "0.1.0"
+authors = ["toyboot4e <toyboot4e@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+refresh_ffi = { path = "refresh_ffi", version = "0.1.0" }
+bitflags = "1.2.1"
+
+[dev-dependencies]
+sdl2 = "0.34.3"
