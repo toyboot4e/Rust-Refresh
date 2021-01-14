@@ -54,6 +54,7 @@ fn gen_bindings(wrapper: impl AsRef<Path>, dst_file_name: impl AsRef<Path>) {
         .parse_callbacks(Box::new(bindgen::CargoCallbacks));
 
     let gen = gen.raw_line(r"#![allow(warnings)]");
+    let gen = gen.derive_default(true);
 
     let gen = gen.generate().unwrap_or_else(|err| {
         panic!(
