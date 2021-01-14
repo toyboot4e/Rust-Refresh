@@ -1,0 +1,13 @@
+[package]
+name = "refresh_ffi"
+version = "0.1.0"
+authors = ["toyboot4e <toyboot4e@gmail.com>"]
+edition = "2018"
+
+links = "Refresh"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.56.0"
+cmake = "0.1.45"
