@@ -9,6 +9,9 @@ use {
 };
 
 fn main() {
+    println!("cargo:rerun-if-changed=wrappers");
+    println!("cargo:rerun-if-changed=Refresh");
+
     self::compile();
     self::gen_bindings("wrappers/refresh_ffi.h", "ffi.rs");
     self::gen_bindings("wrappers/refresh_ffi_image.h", "img.rs");
