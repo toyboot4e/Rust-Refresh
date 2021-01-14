@@ -2456,6 +2456,128 @@ impl Default for Refresh_ShaderModuleCreateInfo {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct Refresh_TextureCreateInfo {
+    pub width: u32,
+    pub height: u32,
+    pub depth: u32,
+    pub isCube: u8,
+    pub sampleCount: Refresh_SampleCount,
+    pub levelCount: u32,
+    pub format: Refresh_ColorFormat,
+    pub usageFlags: Refresh_TextureUsageFlags,
+}
+#[test]
+fn bindgen_test_layout_Refresh_TextureCreateInfo() {
+    assert_eq!(
+        ::std::mem::size_of::<Refresh_TextureCreateInfo>(),
+        32usize,
+        concat!("Size of: ", stringify!(Refresh_TextureCreateInfo))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Refresh_TextureCreateInfo>(),
+        4usize,
+        concat!("Alignment of ", stringify!(Refresh_TextureCreateInfo))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).width as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(width)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).height as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(height)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).depth as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(depth)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).isCube as *const _ as usize
+        },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(isCube)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).sampleCount as *const _ as usize
+        },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(sampleCount)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).levelCount as *const _ as usize
+        },
+        20usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(levelCount)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).format as *const _ as usize
+        },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(format)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<Refresh_TextureCreateInfo>())).usageFlags as *const _ as usize
+        },
+        28usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Refresh_TextureCreateInfo),
+            "::",
+            stringify!(usageFlags)
+        )
+    );
+}
+impl Default for Refresh_TextureCreateInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct Refresh_ShaderStageState {
     pub shaderModule: *mut Refresh_ShaderModule,
     pub entryPointName: *const ::std::os::raw::c_char,
@@ -3641,33 +3763,9 @@ extern "C" {
     ) -> *mut Refresh_ShaderModule;
 }
 extern "C" {
-    pub fn Refresh_CreateTexture2D(
+    pub fn Refresh_CreateTexture(
         device: *mut Refresh_Device,
-        format: Refresh_ColorFormat,
-        width: u32,
-        height: u32,
-        levelCount: u32,
-        usageFlags: Refresh_TextureUsageFlags,
-    ) -> *mut Refresh_Texture;
-}
-extern "C" {
-    pub fn Refresh_CreateTexture3D(
-        device: *mut Refresh_Device,
-        format: Refresh_ColorFormat,
-        width: u32,
-        height: u32,
-        depth: u32,
-        levelCount: u32,
-        usageFlags: Refresh_TextureUsageFlags,
-    ) -> *mut Refresh_Texture;
-}
-extern "C" {
-    pub fn Refresh_CreateTextureCube(
-        device: *mut Refresh_Device,
-        format: Refresh_ColorFormat,
-        size: u32,
-        levelCount: u32,
-        usageFlags: Refresh_TextureUsageFlags,
+        textureCreateInfo: *mut Refresh_TextureCreateInfo,
     ) -> *mut Refresh_Texture;
 }
 extern "C" {

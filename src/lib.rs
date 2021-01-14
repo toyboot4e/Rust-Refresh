@@ -45,6 +45,7 @@ pub type ShaderStageState = ffi::Refresh_ShaderStageState;
 pub type StencilOpState = ffi::Refresh_StencilOpState;
 pub type SysRenderer = ffi::Refresh_SysRenderer;
 pub type Texture = ffi::Refresh_Texture;
+pub type TextureCreateInfo = ffi::Refresh_TextureCreateInfo;
 pub type TextureHandles = ffi::Refresh_TextureHandles;
 pub type TextureSlice = ffi::Refresh_TextureSlice;
 pub type Vec4 = ffi::Refresh_Vec4;
@@ -459,12 +460,12 @@ impl DeviceDrop {
     /// 		It is generally recommended to clear in BeginRenderPass
     /// 		rather than by calling this function unless necessary.
     ///
-    /// * clear_rect:	Area to clear.
-    /// * options:		Bitflags to specify color/depth/stencil buffers for clearing.
-    /// * colors:		An array of color values for the cleared color buffers.
-    /// * color_count:	The number of colors in the above array.
-    /// * depth:		The new value of the cleared depth buffer.
-    /// * stencil:		The new value of the cleared stencil buffer.
+    /// * `clearRect`:	Area to clear.
+    /// * `options`:		Bitflags to specify color/depth/stencil buffers for clearing.
+    /// * `colors`:		An array of color values for the cleared color buffers.
+    /// * `colorCount`:	The number of colors in the above array.
+    /// * `depth`:		The new value of the cleared depth buffer.
+    /// * `stencil`:		The new value of the cleared stencil buffer.
     ///
     pub fn clear(
         &self,
@@ -492,12 +493,12 @@ impl DeviceDrop {
 
     /// Draws data from vertex/index buffers with instancing enabled.
     ///
-    /// base_vertex:			The starting offset to read from the vertex buffer.
-    /// start_index:			The starting offset to read from the index buffer.
-    /// primitive_count:		The number of primitives to draw.
-    /// instance_count:		The number of instances that will be drawn.
-    /// vertex_param_offset:	The offset of the vertex shader param data.
-    /// fragment_param_offset:	The offset of the fragment shader param data.
+    /// * `baseVertex`:			The starting offset to read from the vertex buffer.
+    /// * `startIndex`:			The starting offset to read from the index buffer.
+    /// * `primitiveCount`:		The number of primitives to draw.
+    /// * `instanceCount`:		The number of instances that will be drawn.
+    /// * `vertexParamOffset`:	The offset of the vertex shader param data.
+    /// * `fragmentParamOffset`:	The offset of the fragment shader param data.
     pub fn draw_indexed_primitives(
         &self,
         cbuf: *mut CommandBuffer,
@@ -657,65 +658,22 @@ impl Resource for ShaderModule {
     }
 }
 
-// /* Creates a 2D texture.
-//  *
-//  * format:		The pixel format of the texture data.
-//  * width:		The width of the texture image.
-//  * height: 		The height of the texture image.
-//  * levelCount:	The number of mipmap levels to allocate.
-//  * usageFlags:	Specifies how the texture will be used.
-//  *
-//  * Returns an allocated Refresh_Texture* object. Note that the contents of
-//  * the texture are undefined until SetData is called.
-//  */
-// REFRESHAPI Refresh_Texture* Refresh_CreateTexture2D(
-// 	Refresh_Device *device,
-// 	Refresh_ColorFormat format,
-// 	uint32_t width,
-// 	uint32_t height,
-// 	uint32_t levelCount,
-// 	Refresh_TextureUsageFlags usageFlags
-// );
+impl Resource for Texture {
+    type CreateInfo = TextureCreateInfo;
 
-// /* Creates a 3D texture.
-//  *
-//  * format:		The pixel format of the texture data.
-//  * width:		The width of the texture image.
-//  * height: 		The height of the texture image.
-//  * depth: 		The depth of the texture image.
-//  * levelCount: 	The number of mipmap levels to allocate.
-//  * usageFlags:	Specifies how the texture will be used.
-//  *
-//  * Returns an allocated Refresh_Texture* object. Note that the contents of
-//  * the texture are undefined until SetData is called.
-//  */
-// REFRESHAPI Refresh_Texture* Refresh_CreateTexture3D(
-// 	Refresh_Device *device,
-// 	Refresh_ColorFormat format,
-// 	uint32_t width,
-// 	uint32_t height,
-// 	uint32_t depth,
-// 	uint32_t levelCount,
-// 	Refresh_TextureUsageFlags usageFlags
-// );
+    /// Note that the contents of * the texture are undefined until SetData is called.
+    fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
+        unsafe { ffi::Refresh_CreateTexture(device.raw, info as *const _ as *mut _) }
+    }
 
-// /* Creates a texture cube.
-//  *
-//  * format:		The pixel format of the texture data.
-//  * size: 		The length of the cube side.
-//  * levelCount: 	The number of mipmap levels to allocate.
-//  * usageFlags:	Specifies how the texture will be used.
-//  *
-//  * Returns an allocated Refresh_Texture* object. Note that the contents of
-//  * the texture are undefined until SetData is called.
-//  */
-// REFRESHAPI Refresh_Texture* Refresh_CreateTextureCube(
-// 	Refresh_Device *device,
-// 	Refresh_ColorFormat format,
-// 	uint32_t size,
-// 	uint32_t levelCount,
-// 	Refresh_TextureUsageFlags usageFlags
-// );
+    fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
+        unsafe {
+            ffi::Refresh_QueueDestroyTexture(device.raw, me);
+        }
+    }
+}
+
+// TODO: add CreateInfo or not?
 
 // /* Creates a color target.
 //  *
@@ -752,144 +710,155 @@ impl Resource for ShaderModule {
 // 	uint32_t sizeInBytes
 // );
 
-// /* Setters */
-// /* Uploads image data to a texture object.
-//  *
-//  * 	textureSlice:		The texture slice to be updated.
-//  * 	data:				A pointer to the image data.
-//  * 	dataLengthInBytes:	The size of the image data.
-//  */
-// REFRESHAPI void Refresh_SetTextureData(
-// 	Refresh_Device *driverData,
-// 	Refresh_TextureSlice *textureSlice,
-// 	void *data,
-// 	uint32_t dataLengthInBytes
-// );
+/// Setters
+impl DeviceDrop {
+    /// Uploads image data to a texture object.
+    pub fn set_texture_data(&self, slice: *mut TextureSlice, data: &[u8]) {
+        unsafe {
+            ffi::Refresh_SetTextureData(
+                self.raw,
+                slice,
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
+        }
+    }
 
-// /* Uploads YUV image data to three R8 texture objects.
-//  *
-//  * y:		The texture storing the Y data.
-//  * u:		The texture storing the U (Cb) data.
-//  * v:		The texture storing the V (Cr) data.
-//  * yWidth:	The width of the Y plane.
-//  * yHeight:	The height of the Y plane.
-//  * uvWidth:	The width of the U/V planes.
-//  * uvHeight:	The height of the U/V planes.
-//  * data:	A pointer to the raw YUV image data.
-//  * dataLength:	The size of the image data in bytes.
-//  */
-// REFRESHAPI void Refresh_SetTextureDataYUV(
-// 	Refresh_Device *driverData,
-// 	Refresh_Texture *y,
-// 	Refresh_Texture *u,
-// 	Refresh_Texture *v,
-// 	uint32_t yWidth,
-// 	uint32_t yHeight,
-// 	uint32_t uvWidth,
-// 	uint32_t uvHeight,
-// 	void* data,
-// 	uint32_t dataLength
-// );
+    /// Uploads YUV image data to three R8 texture objects.
+    ///
+    /// * `y`:		The texture storing the Y data.
+    /// * `u`:		The texture storing the U (Cb) data.
+    /// * `v`:		The texture storing the V (Cr) data.
+    /// * `y_width`:	The width of the Y plane.
+    /// * `y_height`:	The height of the Y plane.
+    /// * `uv_width`:	The width of the U/V planes.
+    /// * `uv_height`:	The height of the U/V planes.
+    /// * `data`:	A pointer to the raw YUV image data.
+    /// * `data_length`:	The size of the image data in bytes.
+    ///
+    pub fn set_texture_data_yuv(
+        &self,
+        yuv: [*mut Texture; 3],
+        y_size: [u32; 2],
+        uv_size: [u32; 2],
+        data: &[u8],
+    ) {
+        unsafe {
+            ffi::Refresh_SetTextureDataYUV(
+                self.raw,
+                yuv[0],
+                yuv[1],
+                yuv[2],
+                y_size[0],
+                y_size[1],
+                uv_size[0],
+                uv_size[1],
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
+        }
+    }
 
-// /* Performs an asynchronous texture-to-texture copy.
-//  *
-//  * sourceTextureSlice:		The texture slice from which to copy.
-//  * destinationTextureSlice:	The texture slice to copy to.
-//  * filter:					The filter that will be used if the copy requires scaling.
-//  */
-// REFRESHAPI void Refresh_CopyTextureToTexture(
-// 	Refresh_Device *driverData,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_TextureSlice *sourceTextureSlice,
-// 	Refresh_TextureSlice *destinationTextureSlice,
-// 	Refresh_Filter filter
-// );
+    // /* Performs an asynchronous texture-to-texture copy.
+    //  *
+    //  * sourceTextureSlice:		The texture slice from which to copy.
+    //  * destinationTextureSlice:	The texture slice to copy to.
+    //  * filter:					The filter that will be used if the copy requires scaling.
+    //  */
+    // REFRESHAPI void Refresh_CopyTextureToTexture(
+    // 	Refresh_Device *driverData,
+    // 	Refresh_CommandBuffer *commandBuffer,
+    // 	Refresh_TextureSlice *sourceTextureSlice,
+    // 	Refresh_TextureSlice *destinationTextureSlice,
+    // 	Refresh_Filter filter
+    // );
 
-// /* Asynchronously copies image data from a texture slice into a buffer.
-//  *
-//  * NOTE:
-//  * 	The buffer will not contain correct data until the command buffer
-//  * 	is submitted and completed.
-//  *
-//  * textureSlice:	The texture object being copied.
-//  * buffer:			The buffer being filled with the image data.
-//  */
-// REFRESHAPI void Refresh_CopyTextureToBuffer(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_TextureSlice *textureSlice,
-// 	Refresh_Buffer *buffer
-// );
+    // /* Asynchronously copies image data from a texture slice into a buffer.
+    //  *
+    //  * NOTE:
+    //  * 	The buffer will not contain correct data until the command buffer
+    //  * 	is submitted and completed.
+    //  *
+    //  * textureSlice:	The texture object being copied.
+    //  * buffer:			The buffer being filled with the image data.
+    //  */
+    // REFRESHAPI void Refresh_CopyTextureToBuffer(
+    // 	Refresh_Device *device,
+    // 	Refresh_CommandBuffer *commandBuffer,
+    // 	Refresh_TextureSlice *textureSlice,
+    // 	Refresh_Buffer *buffer
+    // );
 
-// /* Sets a region of the buffer with client data.
-//  *
-//  * NOTE:
-//  * 		Calling this function on a buffer after the buffer
-//  * 		has been bound without calling Submit first is an error.
-//  *
-//  * buffer:			The vertex buffer to be updated.
-//  * offsetInBytes:	The starting offset of the buffer to write into.
-//  * data:			The client data to write into the buffer.
-//  * dataLength:		The length of data from the client buffer to write.
-//  */
-// REFRESHAPI void Refresh_SetBufferData(
-// 	Refresh_Device *device,
-// 	Refresh_Buffer *buffer,
-// 	uint32_t offsetInBytes,
-// 	void* data,
-// 	uint32_t dataLength
-// );
+    // /* Sets a region of the buffer with client data.
+    //  *
+    //  * NOTE:
+    //  * 		Calling this function on a buffer after the buffer
+    //  * 		has been bound without calling Submit first is an error.
+    //  *
+    //  * buffer:			The vertex buffer to be updated.
+    //  * offsetInBytes:	The starting offset of the buffer to write into.
+    //  * data:			The client data to write into the buffer.
+    //  * dataLength:		The length of data from the client buffer to write.
+    //  */
+    // REFRESHAPI void Refresh_SetBufferData(
+    // 	Refresh_Device *device,
+    // 	Refresh_Buffer *buffer,
+    // 	uint32_t offsetInBytes,
+    // 	void* data,
+    // 	uint32_t dataLength
+    // );
 
-// /* Pushes vertex shader params to the device.
-//  * Returns a starting offset value to be used with draw calls.
-//  *
-//  * NOTE:
-//  * 		A pipeline must be bound.
-//  * 		Will use the block size of the currently bound vertex shader.
-//  *
-//  * data: 				The client data to write into the buffer.
-//  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
-//  */
-// REFRESHAPI uint32_t Refresh_PushVertexShaderParams(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	void *data,
-// 	uint32_t paramBlockCount
-// );
+    // /* Pushes vertex shader params to the device.
+    //  * Returns a starting offset value to be used with draw calls.
+    //  *
+    //  * NOTE:
+    //  * 		A pipeline must be bound.
+    //  * 		Will use the block size of the currently bound vertex shader.
+    //  *
+    //  * data: 				The client data to write into the buffer.
+    //  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
+    //  */
+    // REFRESHAPI uint32_t Refresh_PushVertexShaderParams(
+    // 	Refresh_Device *device,
+    // 	Refresh_CommandBuffer *commandBuffer,
+    // 	void *data,
+    // 	uint32_t paramBlockCount
+    // );
 
-// /* Pushes fragment shader params to the device.
-//  * Returns a starting offset value to be used with draw calls.
-//  *
-//  * NOTE:
-//  * 		A graphics pipeline must be bound.
-//  * 		Will use the block size of the currently bound fragment shader.
-//  *
-//  * data: 				The client data to write into the buffer.
-//  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
-//  */
-// REFRESHAPI uint32_t Refresh_PushFragmentShaderParams(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	void *data,
-// 	uint32_t paramBlockCount
-// );
+    // /* Pushes fragment shader params to the device.
+    //  * Returns a starting offset value to be used with draw calls.
+    //  *
+    //  * NOTE:
+    //  * 		A graphics pipeline must be bound.
+    //  * 		Will use the block size of the currently bound fragment shader.
+    //  *
+    //  * data: 				The client data to write into the buffer.
+    //  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
+    //  */
+    // REFRESHAPI uint32_t Refresh_PushFragmentShaderParams(
+    // 	Refresh_Device *device,
+    // 	Refresh_CommandBuffer *commandBuffer,
+    // 	void *data,
+    // 	uint32_t paramBlockCount
+    // );
 
-// /* Pushes compute shader params to the device.
-//  * Returns a starting offset value to be used with draw calls.
-//  *
-//  * NOTE:
-//  * 	A compute pipeline must be bound.
-//  * 	Will use the block size of the currently bound compute shader.
-//  *
-//  * data:			The client data to write into the buffer.
-//  * paramBlockData:	The number of param-sized blocks from the client buffer to write.
-//  */
-// REFRESHAPI uint32_t Refresh_PushComputeShaderParams(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	void *data,
-// 	uint32_t paramBlockCount
-// );
+    // /* Pushes compute shader params to the device.
+    //  * Returns a starting offset value to be used with draw calls.
+    //  *
+    //  * NOTE:
+    //  * 	A compute pipeline must be bound.
+    //  * 	Will use the block size of the currently bound compute shader.
+    //  *
+    //  * data:			The client data to write into the buffer.
+    //  * paramBlockData:	The number of param-sized blocks from the client buffer to write.
+    //  */
+    // REFRESHAPI uint32_t Refresh_PushComputeShaderParams(
+    // 	Refresh_Device *device,
+    // 	Refresh_CommandBuffer *commandBuffer,
+    // 	void *data,
+    // 	uint32_t paramBlockCount
+    // );
+}
 
 // /* Getters */
 // /* Synchronously copies data from a buffer to a pointer.
