@@ -23,7 +23,7 @@ fn main() {
         root.join("src/ffi.rs"),
         args,
         derive_default,
-        "//! Refresh.h\n",
+        "//! Refresh.h",
     );
 
     self::gen_bindings(
@@ -31,7 +31,7 @@ fn main() {
         root.join("src/img.rs"),
         args,
         derive_default,
-        "//! Refresh_Image.h\n",
+        "//! Refresh_Image.h",
     );
 }
 
@@ -71,6 +71,7 @@ fn gen_bindings(
         .parse_callbacks(Box::new(bindgen::CargoCallbacks));
 
     let gen = gen.raw_line(docstring);
+    let gen = gen.raw_line("");
     let gen = gen.raw_line(r"#![allow(warnings)]");
     let gen = gen.derive_default(derive_default);
 
