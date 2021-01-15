@@ -4,6 +4,8 @@ Wrapper of Refresh
 
 */
 
+pub mod img;
+
 pub use refresh_ffi as ffi;
 
 use std::{ops::Deref, os::raw::c_void, rc::Rc};
