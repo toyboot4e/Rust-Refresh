@@ -6,7 +6,7 @@ Wrapper of Refresh
 
 pub use refresh_ffi as ffi;
 
-use std::{ops::Deref, rc::Rc};
+use std::{ops::Deref, os::raw::c_void, rc::Rc};
 
 // --------------------------------------------------------------------------------
 // structs
@@ -759,358 +759,362 @@ impl DeviceDrop {
         }
     }
 
-    // /* Performs an asynchronous texture-to-texture copy.
-    //  *
-    //  * sourceTextureSlice:		The texture slice from which to copy.
-    //  * destinationTextureSlice:	The texture slice to copy to.
-    //  * filter:					The filter that will be used if the copy requires scaling.
-    //  */
-    // REFRESHAPI void Refresh_CopyTextureToTexture(
-    // 	Refresh_Device *driverData,
-    // 	Refresh_CommandBuffer *commandBuffer,
-    // 	Refresh_TextureSlice *sourceTextureSlice,
-    // 	Refresh_TextureSlice *destinationTextureSlice,
-    // 	Refresh_Filter filter
-    // );
+    /// Performs an asynchronous texture-to-texture copy.
+    ///
+    /// * `source_texture_slice`:		The texture slice from which to copy.
+    /// * `destination_texture_slice`:	The texture slice to copy to.
+    /// * `filter`:					The filter that will be used if the copy requires scaling.
+    pub fn copy_texture_to_texture(
+        &self,
+        cbuf: *mut CommandBuffer,
+        src: *mut TextureSlice,
+        dst: *mut TextureSlice,
+        filter: Filter,
+    ) {
+        unsafe {
+            ffi::Refresh_CopyTextureToTexture(self.raw, cbuf, src, dst, filter as u32);
+        }
+    }
 
-    // /* Asynchronously copies image data from a texture slice into a buffer.
-    //  *
-    //  * NOTE:
-    //  * 	The buffer will not contain correct data until the command buffer
-    //  * 	is submitted and completed.
-    //  *
-    //  * textureSlice:	The texture object being copied.
-    //  * buffer:			The buffer being filled with the image data.
-    //  */
-    // REFRESHAPI void Refresh_CopyTextureToBuffer(
-    // 	Refresh_Device *device,
-    // 	Refresh_CommandBuffer *commandBuffer,
-    // 	Refresh_TextureSlice *textureSlice,
-    // 	Refresh_Buffer *buffer
-    // );
+    /// Asynchronously copies image data from a texture slice into a buffer.
+    ///
+    /// NOTE:
+    /// 	The buffer will not contain correct data until the command buffer
+    /// 	is submitted and completed.
+    pub fn copy_texture_to_buffer(
+        &self,
+        cbuf: *mut CommandBuffer,
+        src: *mut TextureSlice,
+        buf: *mut Buffer,
+    ) {
+        unsafe {
+            ffi::Refresh_CopyTextureToBuffer(self.raw, cbuf, src, buf);
+        }
+    }
 
-    // /* Sets a region of the buffer with client data.
-    //  *
-    //  * NOTE:
-    //  * 		Calling this function on a buffer after the buffer
-    //  * 		has been bound without calling Submit first is an error.
-    //  *
-    //  * buffer:			The vertex buffer to be updated.
-    //  * offsetInBytes:	The starting offset of the buffer to write into.
-    //  * data:			The client data to write into the buffer.
-    //  * dataLength:		The length of data from the client buffer to write.
-    //  */
-    // REFRESHAPI void Refresh_SetBufferData(
-    // 	Refresh_Device *device,
-    // 	Refresh_Buffer *buffer,
-    // 	uint32_t offsetInBytes,
-    // 	void* data,
-    // 	uint32_t dataLength
-    // );
+    /// Sets a region of the buffer with client data.
+    ///
+    /// NOTE:
+    /// 		Calling this function on a buffer after the buffer
+    /// 		has been bound without calling Submit first is an error.
+    ///
+    /// * `buffer`:			The vertex buffer to be updated.
+    /// * `offset_in_bytes`:	The starting offset of the buffer to write into.
+    pub fn set_buffer_data(&self, buf: *mut Buffer, offset_in_bytes: u32, data: &[u8]) {
+        unsafe {
+            ffi::Refresh_SetBufferData(
+                self.raw,
+                buf,
+                offset_in_bytes,
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
+        }
+    }
 
-    // /* Pushes vertex shader params to the device.
-    //  * Returns a starting offset value to be used with draw calls.
-    //  *
-    //  * NOTE:
-    //  * 		A pipeline must be bound.
-    //  * 		Will use the block size of the currently bound vertex shader.
-    //  *
-    //  * data: 				The client data to write into the buffer.
-    //  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
-    //  */
-    // REFRESHAPI uint32_t Refresh_PushVertexShaderParams(
-    // 	Refresh_Device *device,
-    // 	Refresh_CommandBuffer *commandBuffer,
-    // 	void *data,
-    // 	uint32_t paramBlockCount
-    // );
+    /// Pushes vertex shader params to the device.
+    /// Returns a starting offset value to be used with draw calls.
+    ///
+    /// NOTE:
+    /// 		A pipeline must be bound.
+    /// 		Will use the block size of the currently bound vertex shader.
+    ///
+    /// * `data`: 				The client data to write into the buffer.
+    /// * `param_block_count`: 	The number of param-sized blocks from the client buffer to write.
+    pub fn push_vertex_shader_params(
+        &self,
+        cbuf: *mut CommandBuffer,
+        data_ptr: *mut c_void,
+        param_block_count: u32,
+    ) {
+        unsafe {
+            ffi::Refresh_PushVertexShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+        }
+    }
 
-    // /* Pushes fragment shader params to the device.
-    //  * Returns a starting offset value to be used with draw calls.
-    //  *
-    //  * NOTE:
-    //  * 		A graphics pipeline must be bound.
-    //  * 		Will use the block size of the currently bound fragment shader.
-    //  *
-    //  * data: 				The client data to write into the buffer.
-    //  * paramBlockCount: 	The number of param-sized blocks from the client buffer to write.
-    //  */
-    // REFRESHAPI uint32_t Refresh_PushFragmentShaderParams(
-    // 	Refresh_Device *device,
-    // 	Refresh_CommandBuffer *commandBuffer,
-    // 	void *data,
-    // 	uint32_t paramBlockCount
-    // );
+    /// Pushes fragment shader params to the device.
+    /// Returns a starting offset value to be used with draw calls.
+    ///
+    /// NOTE:
+    /// 		A graphics pipeline must be bound.
+    /// 		Will use the block size of the currently bound fragment shader.
+    ///
+    /// * `data`: 				The client data to write into the buffer.
+    /// * `param_block_count`: 	The number of param-sized blocks from the client buffer to write.
+    pub fn push_fragment_shader_params(
+        &self,
+        cbuf: *mut CommandBuffer,
+        data_ptr: *mut c_void,
+        param_block_count: u32,
+    ) {
+        unsafe {
+            ffi::Refresh_PushFragmentShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+        }
+    }
 
-    // /* Pushes compute shader params to the device.
-    //  * Returns a starting offset value to be used with draw calls.
-    //  *
-    //  * NOTE:
-    //  * 	A compute pipeline must be bound.
-    //  * 	Will use the block size of the currently bound compute shader.
-    //  *
-    //  * data:			The client data to write into the buffer.
-    //  * paramBlockData:	The number of param-sized blocks from the client buffer to write.
-    //  */
-    // REFRESHAPI uint32_t Refresh_PushComputeShaderParams(
-    // 	Refresh_Device *device,
-    // 	Refresh_CommandBuffer *commandBuffer,
-    // 	void *data,
-    // 	uint32_t paramBlockCount
-    // );
+    /// Pushes compute shader params to the device.
+    /// Returns a starting offset value to be used with draw calls.
+    ///
+    /// NOTE:
+    /// 	A compute pipeline must be bound.
+    /// 	Will use the block size of the currently bound compute shader.
+    ///
+    /// * `data`:			The client data to write into the buffer.
+    /// * `param_block_data`:	The number of param-sized blocks from the client buffer to write.
+    pub fn push_compute_shader_params(
+        &self,
+        cbuf: *mut CommandBuffer,
+        data_ptr: *mut c_void,
+        param_block_count: u32,
+    ) {
+        unsafe {
+            ffi::Refresh_PushComputeShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+        }
+    }
 }
 
-// /* Getters */
-// /* Synchronously copies data from a buffer to a pointer.
-//  * You probably want to wait for a sync point to call this.
-//  *
-//  * buffer: 				The buffer to copy data from.
-//  * data:				The pointer to copy data to.
-//  * dataLengthInBytes:	The length of data to copy.
-//  */
-// REFRESHAPI void Refresh_GetBufferData(
-// 	Refresh_Device *device,
-// 	Refresh_Buffer *buffer,
-// 	void *data,
-// 	uint32_t dataLengthInBytes
-// );
+/// Getters
+impl DeviceDrop {
+    /// Synchronously copies data from a buffer to a pointer.
+    /// You probably want to wait for a sync point to call this.
+    pub fn get_buffer_data(&self, buf: *mut Buffer, dst: &mut [u8]) {
+        unsafe {
+            ffi::Refresh_GetBufferData(self.raw, buf, dst.as_mut_ptr() as *mut _, dst.len() as u32);
+        }
+    }
+}
 
-// /* Disposal */
-// /* Sends a texture to be destroyed by the renderer. Note that we call it
-//  * "QueueDestroy" because it may not be immediately destroyed by the renderer if
-//  * this is not called from the main thread (for example, if a garbage collector
-//  * deletes the resource instead of the programmer).
-//  *
-//  * texture: The Refresh_Texture to be destroyed.
-//  */
-// REFRESHAPI void Refresh_QueueDestroyTexture(
-// 	Refresh_Device *device,
-// 	Refresh_Texture *texture
-// );
+/// Graphics State
+impl DeviceDrop {
+    /// Begins a render pass.
+    ///
+    /// * `render_pass`: The renderpass to begin.
+    /// * `framebuffer`: The framebuffer to bind for the render pass.
+    /// * `render_area`:
+    /// 		The area affected by the render pass.
+    /// 		All load, store and resolve operations are restricted
+    /// 		to the given rectangle.
+    /// * `clear_values`:
+    /// 		A pointer to an array of Refresh_Color structures
+    /// 		that contains clear values for each color target in the
+    /// 		framebuffer. May be NULL.
+    /// * `clear_count`: The amount of color structs in the above array.
+    /// * `depth_stencil_clear_value`: The depth/stencil clear value. May be NULL.
+    pub fn begin_render_pass(
+        &self,
+        cbuf: *mut CommandBuffer,
+        rpass: *mut RenderPass,
+        fbuf: *mut Framebuffer,
+        area: Rect,
+        clear: Option<&[Color]>,
+        depth_stencil_clear_value: &DepthStencilValue,
+    ) {
+        let (ptr, len) = match clear {
+            None => (std::ptr::null_mut(), 0),
+            Some(xs) => (xs.as_ptr() as *const _ as *mut _, xs.len() as u32),
+        };
+        unsafe {
+            ffi::Refresh_BeginRenderPass(
+                self.raw,
+                cbuf,
+                rpass,
+                fbuf,
+                area,
+                ptr,
+                len,
+                depth_stencil_clear_value as *const _ as *mut _,
+            );
+        }
+    }
 
-// /* Sends a sampler to be destroyed by the renderer. Note that we call it
-//  * "QueueDestroy" because it may not be immediately destroyed by the renderer if
-//  * this is not called from the main thread (for example, if a garbage collector
-//  * deletes the resource instead of the programmer).
-//  *
-//  * texture: The Refresh_Sampler to be destroyed.
-//  */
-// REFRESHAPI void Refresh_QueueDestroySampler(
-// 	Refresh_Device *device,
-// 	Refresh_Sampler *sampler
-// );
+    /// Ends the current render pass
+    pub fn end_render_pass(&self, cbuf: *mut CommandBuffer) {
+        unsafe {
+            ffi::Refresh_EndRenderPass(self.raw, cbuf);
+        }
+    }
 
-// /* Sends a buffer to be destroyed by the renderer. Note that we call it
-//  * "QueueDestroy" because it may not be immediately destroyed by the renderer if
-//  * this is not called from the main thread (for example, if a garbage collector
-//  * deletes the resource instead of the programmer).
-//  *
-//  * buffer: The Refresh_Buffer to be destroyed.
-//  */
-// REFRESHAPI void Refresh_QueueDestroyBuffer(
-// 	Refresh_Device *device,
-// 	Refresh_Buffer *buffer
-// );
+    //// Binds a graphics pipeline to the graphics bind point
+    pub fn bind_graphics_pipeline(&self, cbuf: *mut CommandBuffer, gpip: *mut GraphicsPipeline) {
+        unsafe {
+            ffi::Refresh_BindGraphicsPipeline(self.raw, cbuf, gpip);
+        }
+    }
 
-// /* Sends a color target to be destroyed by the renderer. Note that we call it
-//  * "QueueDestroy" because it may not be immediately destroyed by the renderer if
-//  * this is not called from the main thread (for example, if a garbage collector
-//  * deletes the resource instead of the programmer).
-//  *
-//  * colorTarget: The Refresh_ColorTarget to be destroyed.
-//  */
-// REFRESHAPI void Refresh_QueueDestroyColorTarget(
-// 	Refresh_Device *device,
-// 	Refresh_ColorTarget *colorTarget
-// );
+    /// Binds vertex buffers for use with subsequent draw calls
+    pub fn bind_vertex_buffers(
+        &self,
+        cbuf: *mut CommandBuffer,
+        bufs: &[*mut Buffer],
+        offsets: &[usize],
+    ) {
+        unsafe {
+            ffi::Refresh_BindVertexBuffers(
+                self.raw,
+                cbuf,
+                // firstBinding
+                0,
+                // bindingCount
+                bufs.len() as u32,
+                bufs.as_ptr() as *const _ as *mut _,
+                offsets.as_ptr() as *const _ as *mut _,
+            );
+        }
+    }
 
-// /* Sends a depth/stencil target to be destroyed by the renderer. Note that we call it
-//  * "QueueDestroy" because it may not be immediately destroyed by the renderer if
-//  * this is not called from the main thread (for example, if a garbage collector
-//  * deletes the resource instead of the programmer).
-//  *
-//  * depthStencilTarget: The Refresh_DepthStencilTarget to be destroyed.
-//  */
-// REFRESHAPI void Refresh_QueueDestroyDepthStencilTarget(
-// 	Refresh_Device *device,
-// 	Refresh_DepthStencilTarget *depthStencilTarget
-// );
+    /// Binds an index buffer for use with subsequent draw calls
+    pub fn bind_index_buffer(
+        &self,
+        cbuf: *mut CommandBuffer,
+        buf: *mut Buffer,
+        offset: u64,
+        size: IndexElementSize,
+    ) {
+        unsafe {
+            ffi::Refresh_BindIndexBuffer(self.raw, cbuf, buf, offset, size as u32);
+        }
+    }
+    /// Sets textures/samplers for use with the currently bound vertex shader.
+    ///
+    /// NOTE:
+    /// 		The length of the passed arrays must be equal to the number
+    /// 		of sampler bindings specified by the pipeline.
+    ///
+    /// * `textures`:	A pointer to an array of textures.
+    /// * `samplers`:	A pointer to an array of samplers.
+    pub fn bind_vertex_samplers(
+        &self,
+        cbuf: *mut CommandBuffer,
+        texs: &[*mut Texture],
+        samplers: &[*mut Sampler],
+    ) {
+        unsafe {
+            ffi::Refresh_BindVertexSamplers(
+                self.raw,
+                cbuf,
+                texs.as_ptr() as *mut _,
+                samplers.as_ptr() as *mut _,
+            );
+        }
+    }
 
-// /* Graphics State */
-// /* Begins a render pass.
-//  *
-//  * renderPass: The renderpass to begin.
-//  * framebuffer: The framebuffer to bind for the render pass.
-//  * renderArea:
-//  * 		The area affected by the render pass.
-//  * 		All load, store and resolve operations are restricted
-//  * 		to the given rectangle.
-//  * clearValues:
-//  * 		A pointer to an array of Refresh_Color structures
-//  * 		that contains clear values for each color target in the
-//  * 		framebuffer. May be NULL.
-//  * clearCount: The amount of color structs in the above array.
-//  * depthStencilClearValue: The depth/stencil clear value. May be NULL.
-//  */
-// REFRESHAPI void Refresh_BeginRenderPass(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_RenderPass *renderPass,
-// 	Refresh_Framebuffer *framebuffer,
-// 	Refresh_Rect renderArea,
-// 	Refresh_Color *pColorClearValues,
-// 	uint32_t colorClearCount,
-// 	Refresh_DepthStencilValue *depthStencilClearValue
-// );
+    /// Sets textures/samplers for use with the currently bound fragment shader.
+    ///
+    /// NOTE:
+    ///		The length of the passed arrays must be equal to the number
+    /// 		of sampler bindings specified by the pipeline.
+    ///
+    /// * `textures`: 	A pointer to an array of textures.
+    /// * `samplers`:	A pointer to an array of samplers.
+    pub fn bind_fragment_samplers(
+        &self,
+        cbuf: *mut CommandBuffer,
+        texs: &[*mut Texture],
+        samplers: &[*mut Sampler],
+    ) {
+        unsafe {
+            ffi::Refresh_BindFragmentSamplers(
+                self.raw,
+                cbuf,
+                texs.as_ptr() as *mut _,
+                samplers.as_ptr() as *mut _,
+            );
+        }
+    }
 
-// /* Ends the current render pass. */
-// REFRESHAPI void Refresh_EndRenderPass(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer
-// );
+    /// Binds a compute pipeline to the compute bind point
+    pub fn bind_compute_pipeline(&self, cbuf: *mut CommandBuffer, cpip: *mut ComputePipeline) {
+        unsafe {
+            ffi::Refresh_BindComputePipeline(self.raw, cbuf, cpip);
+        }
+    }
 
-// /* Binds a graphics pipeline to the graphics bind point. */
-// REFRESHAPI void Refresh_BindGraphicsPipeline(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_GraphicsPipeline *graphicsPipeline
-// );
+    /// Binds buffers for use with the currently bound compute pipeline.
+    ///
+    /// * `p_buffers`: An array of buffers to bind.
+    /// 	Length must be equal to the number of buffers
+    /// 	specified by the compute pipeline.
+    pub fn bind_compute_buffers(&self, cbuf: *mut CommandBuffer, bufs: &[*mut Buffer]) {
+        unsafe {
+            ffi::Refresh_BindComputeBuffers(self.raw, cbuf, bufs.as_ptr() as *mut _);
+        }
+    }
 
-// /* Binds vertex buffers for use with subsequent draw calls. */
-// REFRESHAPI void Refresh_BindVertexBuffers(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	uint32_t firstBinding,
-// 	uint32_t bindingCount,
-// 	Refresh_Buffer **pBuffers,
-// 	uint64_t *pOffsets
-// );
+    /// Binds textures for use with the currently bound compute pipeline.
+    ///
+    /// * `p_textures`: An array of textures to bind.
+    /// 	Length must be equal to the number of buffers
+    /// 	specified by the compute pipeline.
+    pub fn bind_compute_textures(&self, cbuf: *mut CommandBuffer, texs: &[*mut Texture]) {
+        unsafe {
+            ffi::Refresh_BindComputeTextures(self.raw, cbuf, texs.as_ptr() as *mut _);
+        }
+    }
+}
 
-// /* Binds an index buffer for use with subsequent draw calls. */
-// REFRESHAPI void Refresh_BindIndexBuffer(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_Buffer *buffer,
-// 	uint64_t offset,
-// 	Refresh_IndexElementSize indexElementSize
-// );
+/// Submission/Presentation
+impl DeviceDrop {
+    /// Returns an allocated Refresh_CommandBuffer* object.
+    /// This command buffer is managed by the implementation and
+    /// should NOT be freed by the user.
+    ///
+    /// NOTE:
+    /// 	A command buffer may only be used on the thread that
+    /// 	it was acquired on. Using it on any other thread is an error.
+    ///
+    /// * `fixed`:
+    /// 	If a command buffer is designated as fixed, it can be
+    /// 	acquired once, have commands recorded into it, and
+    /// 	be re-submitted indefinitely.
+    pub fn acquire_command_buffer(&self, is_fixed: bool) -> *mut CommandBuffer {
+        unsafe { ffi::Refresh_AcquireCommandBuffer(self.raw, is_fixed as u8) }
+    }
 
-// /* Sets textures/samplers for use with the currently bound vertex shader.
-//  *
-//  * NOTE:
-//  * 		The length of the passed arrays must be equal to the number
-//  * 		of sampler bindings specified by the pipeline.
-//  *
-//  * textures:	A pointer to an array of textures.
-//  * samplers:	A pointer to an array of samplers.
-//  */
-// REFRESHAPI void Refresh_BindVertexSamplers(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_Texture **pTextures,
-// 	Refresh_Sampler **pSamplers
-// );
+    /// Queues an image to be presented to the screen.
+    /// The image will be presented upon the next Refresh_Submit call.
+    ///
+    /// NOTE:
+    ///		It is an error to call this function in headless mode.
+    ///
+    /// * `texture_slice`:			The texture slice to present.
+    /// * `destination_rectangle`:	The region of the window to update. Can be NULL.
+    /// * `filter`:					The filter to use if scaling is required.
+    pub fn queue_present(
+        &self,
+        cbuf: *mut CommandBuffer,
+        tex_slice: &TextureSlice,
+        rect: &Rect,
+        filter: Filter,
+    ) {
+        unsafe {
+            ffi::Refresh_QueuePresent(
+                self.raw,
+                cbuf,
+                tex_slice as *const _ as *mut _,
+                rect as *const _ as *mut _,
+                filter as u32,
+            );
+        }
+    }
 
-// /* Sets textures/samplers for use with the currently bound fragment shader.
-//  *
-//  * NOTE:
-//  *		The length of the passed arrays must be equal to the number
-//  * 		of sampler bindings specified by the pipeline.
-//  *
-//  * textures: 	A pointer to an array of textures.
-//  * samplers:	A pointer to an array of samplers.
-//  */
-// REFRESHAPI void Refresh_BindFragmentSamplers(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_Texture **pTextures,
-// 	Refresh_Sampler **pSamplers
-// );
+    ///Submits all of the enqueued commands
+    pub fn submit(&self, cbufs: &[*mut CommandBuffer]) {
+        unsafe {
+            ffi::Refresh_Submit(self.raw, cbufs.len() as u32, cbufs.as_ptr() as *mut _);
+        }
+    }
 
-// /* Binds a compute pipeline to the compute bind point. */
-// REFRESHAPI void Refresh_BindComputePipeline(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_ComputePipeline *computePipeline
-// );
+    /// Waits for the previous submission to complete
+    pub fn wait(&self) {
+        unsafe {
+            ffi::Refresh_Wait(self.raw);
+        }
+    }
 
-// /* Binds buffers for use with the currently bound compute pipeline.
-//  *
-//  * pBuffers: An array of buffers to bind.
-//  * 	Length must be equal to the number of buffers
-//  * 	specified by the compute pipeline.
-//  */
-// REFRESHAPI void Refresh_BindComputeBuffers(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_Buffer **pBuffers
-// );
-
-// /* Binds textures for use with the currently bound compute pipeline.
-//  *
-//  * pTextures: An array of textures to bind.
-//  * 	Length must be equal to the number of buffers
-//  * 	specified by the compute pipeline.
-//  */
-// REFRESHAPI void Refresh_BindComputeTextures(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_Texture **pTextures
-// );
-
-// /* Submission/Presentation */
-// /* Returns an allocated Refresh_CommandBuffer* object.
-//  * This command buffer is managed by the implementation and
-//  * should NOT be freed by the user.
-//  *
-//  * NOTE:
-//  * 	A command buffer may only be used on the thread that
-//  * 	it was acquired on. Using it on any other thread is an error.
-//  *
-//  * fixed:
-//  * 	If a command buffer is designated as fixed, it can be
-//  * 	acquired once, have commands recorded into it, and
-//  * 	be re-submitted indefinitely.
-//  *
-//  */
-// REFRESHAPI Refresh_CommandBuffer* Refresh_AcquireCommandBuffer(
-// 	Refresh_Device *device,
-// 	uint8_t fixed
-// );
-
-// /* Queues an image to be presented to the screen.
-//  * The image will be presented upon the next Refresh_Submit call.
-//  *
-//  * NOTE:
-//  *		It is an error to call this function in headless mode.
-//  *
-//  * textureSlice:			The texture slice to present.
-//  * destinationRectangle:	The region of the window to update. Can be NULL.
-//  * filter:					The filter to use if scaling is required.
-//  */
-// REFRESHAPI void Refresh_QueuePresent(
-// 	Refresh_Device *device,
-// 	Refresh_CommandBuffer *commandBuffer,
-// 	Refresh_TextureSlice *textureSlice,
-// 	Refresh_Rect *destinationRectangle,
-// 	Refresh_Filter filter
-// );
-
-// /* Submits all of the enqueued commands. */
-// REFRESHAPI void Refresh_Submit(
-// 	Refresh_Device* device,
-// 	uint32_t commandBufferCount,
-// 	Refresh_CommandBuffer **pCommandBuffers
-// );
-
-// /* Waits for the previous submission to complete. */
-// REFRESHAPI void Refresh_Wait(
-// 	Refresh_Device *device
-// );
-
-// /* Export handles to be consumed by another API */
-// REFRESHAPI void Refresh_GetTextureHandles(
-// 	Refresh_Device* device,
-// 	Refresh_Texture* texture,
-// 	Refresh_TextureHandles* handles
-// );
+    /// Export handles to be consumed by another API
+    pub fn get_texture_handles(&self, tex: *mut Texture, handles: &mut TextureHandles) {
+        unsafe {
+            ffi::Refresh_GetTextureHandles(self.raw, tex, handles as *mut _);
+        }
+    }
+}
