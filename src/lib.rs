@@ -747,17 +747,6 @@ impl Resource for Buffer {
     }
 }
 
-// /* Creates a buffer.
-//  *
-//  * usageFlags:	Specifies how the buffer will be used.
-//  * sizeInBytes:	The length of the buffer.
-//  */
-// REFRESHAPI Refresh_Buffer* Refresh_CreateBuffer(
-// 	Refresh_Device *device,
-// 	Refresh_BufferUsageFlags usageFlags,
-// 	uint32_t sizeInBytes
-// );
-
 /// Setters
 impl DeviceDrop {
     /// Uploads image data to a texture object.
