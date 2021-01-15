@@ -673,31 +673,79 @@ impl Resource for Texture {
     }
 }
 
-// TODO: add CreateInfo or not?
+/// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
+pub struct ColorTargetCreateInfo {
+    pub multi_sample_count: SampleCount,
+    pub texture_slice: *mut TextureSlice,
+}
 
-// /* Creates a color target.
-//  *
-//  * multisampleCount:	The MSAA value for the color target.
-//  * textureSlice: 		The texture slice that the color target will resolve to.
-//  */
-// REFRESHAPI Refresh_ColorTarget* Refresh_CreateColorTarget(
-// 	Refresh_Device *device,
-// 	Refresh_SampleCount multisampleCount,
-// 	Refresh_TextureSlice *textureSlice
-// );
+impl Resource for ColorTarget {
+    type CreateInfo = ColorTargetCreateInfo;
 
-// /* Creates a depth/stencil target.
-//  *
-//  * width:	The width of the depth/stencil target.
-//  * height: 	The height of the depth/stencil target.
-//  * format:	The storage format of the depth/stencil target.
-//  */
-// REFRESHAPI Refresh_DepthStencilTarget* Refresh_CreateDepthStencilTarget(
-// 	Refresh_Device *device,
-// 	uint32_t width,
-// 	uint32_t height,
-// 	Refresh_DepthFormat format
-// );
+    /// Note that the contents of * the texture are undefined until SetData is called.
+    fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
+        unsafe {
+            ffi::Refresh_CreateColorTarget(
+                device.raw,
+                info.multi_sample_count as u32,
+                info.texture_slice,
+            )
+        }
+    }
+
+    fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
+        unsafe {
+            ffi::Refresh_QueueDestroyColorTarget(device.raw, me);
+        }
+    }
+}
+
+/// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
+pub struct DepthStencilTargetCreateInfo {
+    pub w: u32,
+    pub h: u32,
+    pub format: DepthFormat,
+}
+
+impl Resource for DepthStencilTarget {
+    type CreateInfo = DepthStencilTargetCreateInfo;
+
+    /// Note that the contents of * the texture are undefined until SetData is called.
+    fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
+        unsafe {
+            ffi::Refresh_CreateDepthStencilTarget(device.raw, info.w, info.h, info.format as u32)
+        }
+    }
+
+    fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
+        unsafe {
+            ffi::Refresh_QueueDestroyDepthStencilTarget(device.raw, me);
+        }
+    }
+}
+
+/// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
+pub struct BufferCreateInfo {
+    pub usage_flags: BufferUsageFlags,
+    pub size_in_bytes: u32,
+}
+
+impl Resource for Buffer {
+    type CreateInfo = BufferCreateInfo;
+
+    /// Note that the contents of * the texture are undefined until SetData is called.
+    fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
+        unsafe {
+            ffi::Refresh_CreateBuffer(device.raw, info.usage_flags.bits(), info.size_in_bytes)
+        }
+    }
+
+    fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
+        unsafe {
+            ffi::Refresh_QueueDestroyBuffer(device.raw, me);
+        }
+    }
+}
 
 // /* Creates a buffer.
 //  *
