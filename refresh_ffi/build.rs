@@ -13,8 +13,26 @@ fn main() {
     println!("cargo:rerun-if-changed=Refresh");
 
     self::compile();
-    self::gen_bindings("wrappers/refresh_ffi.h", "ffi.rs");
-    self::gen_bindings("wrappers/refresh_ffi_image.h", "img.rs");
+
+    let root = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+    let args = &[format!("-I{}", root.join("Refresh/include").display())];
+    let derive_default = true;
+
+    self::gen_bindings(
+        root.join("wrappers/refresh_ffi.h"),
+        root.join("src/ffi.rs"),
+        args,
+        derive_default,
+        "//! Refresh.h\n",
+    );
+
+    self::gen_bindings(
+        root.join("wrappers/refresh_ffi_image.h"),
+        root.join("src/img.rs"),
+        args,
+        derive_default,
+        "//! Refresh_Image.h\n",
+    );
 }
 
 /// Run `cmake` (only when it's necessary) and link the output library
@@ -38,32 +56,32 @@ fn compile() {
     println!("cargo:rustc-link-lib=dylib=Refresh");
 }
 
-/// Generates bindings using a wrapper header file
-fn gen_bindings(wrapper: impl AsRef<Path>, dst_file_name: impl AsRef<Path>) {
-    let wrapper = wrapper.as_ref();
-    let dst_file_name = dst_file_name.as_ref();
-
-    let root = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let out_dir = root.join("src");
-    let dst = out_dir.join(&dst_file_name);
-
+/// Generates Rust FFI using a wrapper header file
+fn gen_bindings(
+    wrapper: impl AsRef<Path>,
+    dst: impl AsRef<Path>,
+    args: impl IntoIterator<Item = impl AsRef<str>>,
+    derive_default: bool,
+    docstring: &str,
+) {
     let gen = bindgen::Builder::default()
-        .header(format!("{}", wrapper.display()))
+        .header(format!("{}", wrapper.as_ref().display()))
         .derive_default(true)
-        .clang_arg(format!("-I{}", root.join("Refresh/include").display()))
+        .clang_args(args)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks));
 
+    let gen = gen.raw_line(docstring);
     let gen = gen.raw_line(r"#![allow(warnings)]");
-    let gen = gen.derive_default(true);
+    let gen = gen.derive_default(derive_default);
 
     let gen = gen.generate().unwrap_or_else(|err| {
         panic!(
             "Unable to generate bindings for `{}`. Original error {:?}",
-            dst_file_name.display(),
+            dst.as_ref().display(),
             err
         )
     });
 
-    // it's `ok` to fail conidering crates.io
-    gen.write_to_file(&dst).ok();
+    // it's `ok` to fail on crates.io
+    gen.write_to_file(dst).ok();
 }
