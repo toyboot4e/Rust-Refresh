@@ -23,7 +23,7 @@ fn main() {
         root.join("src/ffi.rs"),
         args,
         derive_default,
-        "//! Refresh.h",
+        "//! Rust FFI to `Refresh.h`",
     );
 
     self::gen_bindings(
@@ -31,7 +31,7 @@ fn main() {
         root.join("src/img.rs"),
         args,
         derive_default,
-        "//! Refresh_Image.h",
+        "//! Rust FFI to `Refresh_Image.h`",
     );
 }
 
@@ -40,14 +40,14 @@ fn compile() {
     let root = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-    let out_lib_path = out_dir.join("libRefresh.dylib");
-    if !out_lib_path.is_file() {
-        let path = root.join("Refresh");
-        let _out = Config::new(path)
-            .no_build_target(true)
-            .cflag("-w") // suppress errors
-            .build();
-    }
+    // let out_lib_path = out_dir.join("libRefresh.dylib");
+    // if !out_lib_path.is_file() {
+    let path = root.join("Refresh");
+    let _out_dir = Config::new(path)
+        .no_build_target(true)
+        .cflag("-w") // suppress errors
+        .build();
+    // }
 
     println!(
         "cargo:rustc-link-search=native={}",
@@ -66,14 +66,14 @@ fn gen_bindings(
 ) {
     let gen = bindgen::Builder::default()
         .header(format!("{}", wrapper.as_ref().display()))
-        .derive_default(true)
         .clang_args(args)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks));
 
-    let gen = gen.raw_line(docstring);
-    let gen = gen.raw_line("");
-    let gen = gen.raw_line(r"#![allow(warnings)]");
     let gen = gen.derive_default(derive_default);
+    let gen = gen
+        .raw_line(docstring)
+        .raw_line("")
+        .raw_line(r"#![allow(warnings)]");
 
     let gen = gen.generate().unwrap_or_else(|err| {
         panic!(
