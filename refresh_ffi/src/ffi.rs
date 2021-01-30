@@ -718,12 +718,7 @@ pub struct Refresh_Sampler {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct Refresh_ColorTarget {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Refresh_DepthStencilTarget {
+pub struct Refresh_RenderTarget {
     _unused: [u8; 0],
 }
 #[repr(C)]
@@ -782,35 +777,39 @@ pub type Refresh_ClearOptions = u32;
 pub const Refresh_IndexElementSize_REFRESH_INDEXELEMENTSIZE_16BIT: Refresh_IndexElementSize = 0;
 pub const Refresh_IndexElementSize_REFRESH_INDEXELEMENTSIZE_32BIT: Refresh_IndexElementSize = 1;
 pub type Refresh_IndexElementSize = ::std::os::raw::c_uint;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8B8A8: Refresh_ColorFormat = 0;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R5G6B5: Refresh_ColorFormat = 1;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_A1R5G5B5: Refresh_ColorFormat = 2;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_B4G4R4A4: Refresh_ColorFormat = 3;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_BC1: Refresh_ColorFormat = 4;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_BC2: Refresh_ColorFormat = 5;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_BC3: Refresh_ColorFormat = 6;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8_SNORM: Refresh_ColorFormat = 7;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8B8A8_SNORM: Refresh_ColorFormat = 8;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_A2R10G10B10: Refresh_ColorFormat = 9;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16: Refresh_ColorFormat = 10;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16B16A16: Refresh_ColorFormat = 11;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R8: Refresh_ColorFormat = 12;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R32_SFLOAT: Refresh_ColorFormat = 13;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R32G32_SFLOAT: Refresh_ColorFormat = 14;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R32G32B32A32_SFLOAT: Refresh_ColorFormat = 15;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R16_SFLOAT: Refresh_ColorFormat = 16;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16_SFLOAT: Refresh_ColorFormat = 17;
-pub const Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16B16A16_SFLOAT: Refresh_ColorFormat = 18;
-pub type Refresh_ColorFormat = ::std::os::raw::c_uint;
-pub const Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D16_UNORM: Refresh_DepthFormat = 0;
-pub const Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D32_SFLOAT: Refresh_DepthFormat = 1;
-pub const Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D16_UNORM_S8_UINT: Refresh_DepthFormat = 2;
-pub const Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D32_SFLOAT_S8_UINT: Refresh_DepthFormat = 3;
-pub type Refresh_DepthFormat = ::std::os::raw::c_uint;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8B8A8: Refresh_TextureFormat = 0;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R5G6B5: Refresh_TextureFormat = 1;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_A1R5G5B5: Refresh_TextureFormat = 2;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_B4G4R4A4: Refresh_TextureFormat = 3;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC1: Refresh_TextureFormat = 4;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC2: Refresh_TextureFormat = 5;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC3: Refresh_TextureFormat = 6;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8_SNORM: Refresh_TextureFormat = 7;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8B8A8_SNORM: Refresh_TextureFormat = 8;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_A2R10G10B10: Refresh_TextureFormat = 9;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16: Refresh_TextureFormat = 10;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16B16A16: Refresh_TextureFormat = 11;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8: Refresh_TextureFormat = 12;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32_SFLOAT: Refresh_TextureFormat = 13;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32G32_SFLOAT: Refresh_TextureFormat = 14;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32G32B32A32_SFLOAT: Refresh_TextureFormat =
+    15;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16_SFLOAT: Refresh_TextureFormat = 16;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16_SFLOAT: Refresh_TextureFormat = 17;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16B16A16_SFLOAT: Refresh_TextureFormat =
+    18;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D16_UNORM: Refresh_TextureFormat = 19;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D32_SFLOAT: Refresh_TextureFormat = 20;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D16_UNORM_S8_UINT: Refresh_TextureFormat = 21;
+pub const Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D32_SFLOAT_S8_UINT: Refresh_TextureFormat =
+    22;
+pub type Refresh_TextureFormat = ::std::os::raw::c_uint;
 pub const Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_SAMPLER_BIT:
     Refresh_TextureUsageFlagBits = 1;
 pub const Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_COLOR_TARGET_BIT:
     Refresh_TextureUsageFlagBits = 2;
+pub const Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_DEPTH_STENCIL_TARGET_BIT:
+    Refresh_TextureUsageFlagBits = 4;
 pub type Refresh_TextureUsageFlagBits = ::std::os::raw::c_uint;
 pub type Refresh_TextureUsageFlags = u32;
 pub const Refresh_SampleCount_REFRESH_SAMPLECOUNT_1: Refresh_SampleCount = 0;
@@ -2174,7 +2173,7 @@ fn bindgen_test_layout_Refresh_GraphicsPipelineLayoutCreateInfo() {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Refresh_ColorTargetDescription {
-    pub format: Refresh_ColorFormat,
+    pub format: Refresh_TextureFormat,
     pub multisampleCount: Refresh_SampleCount,
     pub loadOp: Refresh_LoadOp,
     pub storeOp: Refresh_StoreOp,
@@ -2249,7 +2248,7 @@ impl Default for Refresh_ColorTargetDescription {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Refresh_DepthStencilTargetDescription {
-    pub depthFormat: Refresh_DepthFormat,
+    pub depthStencilFormat: Refresh_TextureFormat,
     pub loadOp: Refresh_LoadOp,
     pub storeOp: Refresh_StoreOp,
     pub stencilLoadOp: Refresh_LoadOp,
@@ -2275,7 +2274,7 @@ fn bindgen_test_layout_Refresh_DepthStencilTargetDescription() {
     );
     assert_eq!(
         unsafe {
-            &(*(::std::ptr::null::<Refresh_DepthStencilTargetDescription>())).depthFormat
+            &(*(::std::ptr::null::<Refresh_DepthStencilTargetDescription>())).depthStencilFormat
                 as *const _ as usize
         },
         0usize,
@@ -2283,7 +2282,7 @@ fn bindgen_test_layout_Refresh_DepthStencilTargetDescription() {
             "Offset of field: ",
             stringify!(Refresh_DepthStencilTargetDescription),
             "::",
-            stringify!(depthFormat)
+            stringify!(depthStencilFormat)
         )
     );
     assert_eq!(
@@ -2465,7 +2464,7 @@ pub struct Refresh_TextureCreateInfo {
     pub isCube: u8,
     pub sampleCount: Refresh_SampleCount,
     pub levelCount: u32,
-    pub format: Refresh_ColorFormat,
+    pub format: Refresh_TextureFormat,
     pub usageFlags: Refresh_TextureUsageFlags,
 }
 #[test]
@@ -3369,9 +3368,9 @@ impl Default for Refresh_GraphicsPipelineCreateInfo {
 #[derive(Debug, Copy, Clone)]
 pub struct Refresh_FramebufferCreateInfo {
     pub renderPass: *mut Refresh_RenderPass,
-    pub pColorTargets: *mut *mut Refresh_ColorTarget,
+    pub pColorTargets: *mut *mut Refresh_RenderTarget,
     pub colorTargetCount: u32,
-    pub pDepthStencilTarget: *mut Refresh_DepthStencilTarget,
+    pub pDepthStencilTarget: *mut Refresh_RenderTarget,
     pub width: u32,
     pub height: u32,
 }
@@ -3681,8 +3680,7 @@ extern "C" {
         options: Refresh_ClearOptions,
         colors: *mut Refresh_Color,
         colorCount: u32,
-        depth: f32,
-        stencil: i32,
+        depthStencil: Refresh_DepthStencilValue,
     );
 }
 extern "C" {
@@ -3771,19 +3769,11 @@ extern "C" {
     ) -> *mut Refresh_Texture;
 }
 extern "C" {
-    pub fn Refresh_CreateColorTarget(
+    pub fn Refresh_CreateRenderTarget(
         device: *mut Refresh_Device,
-        multisampleCount: Refresh_SampleCount,
         textureSlice: *mut Refresh_TextureSlice,
-    ) -> *mut Refresh_ColorTarget;
-}
-extern "C" {
-    pub fn Refresh_CreateDepthStencilTarget(
-        device: *mut Refresh_Device,
-        width: u32,
-        height: u32,
-        format: Refresh_DepthFormat,
-    ) -> *mut Refresh_DepthStencilTarget;
+        multisampleCount: Refresh_SampleCount,
+    ) -> *mut Refresh_RenderTarget;
 }
 extern "C" {
     pub fn Refresh_CreateBuffer(
@@ -3882,15 +3872,9 @@ extern "C" {
     pub fn Refresh_QueueDestroyBuffer(device: *mut Refresh_Device, buffer: *mut Refresh_Buffer);
 }
 extern "C" {
-    pub fn Refresh_QueueDestroyColorTarget(
+    pub fn Refresh_QueueDestroyRenderTarget(
         device: *mut Refresh_Device,
-        colorTarget: *mut Refresh_ColorTarget,
-    );
-}
-extern "C" {
-    pub fn Refresh_QueueDestroyDepthStencilTarget(
-        device: *mut Refresh_Device,
-        depthStencilTarget: *mut Refresh_DepthStencilTarget,
+        renderTarget: *mut Refresh_RenderTarget,
     );
 }
 extern "C" {
@@ -3929,7 +3913,7 @@ extern "C" {
         commandBuffer: *mut Refresh_CommandBuffer,
         renderPass: *mut Refresh_RenderPass,
         framebuffer: *mut Refresh_Framebuffer,
-        renderArea: Refresh_Rect,
+        renderArea: *mut Refresh_Rect,
         pColorClearValues: *mut Refresh_Color,
         colorClearCount: u32,
         depthStencilClearValue: *mut Refresh_DepthStencilValue,

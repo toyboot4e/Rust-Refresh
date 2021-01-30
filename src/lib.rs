@@ -16,7 +16,6 @@ use std::{ops::Deref, os::raw::c_void, rc::Rc};
 pub use ffi::Refresh_Buffer as Buffer;
 pub use ffi::Refresh_Color as Color;
 pub use ffi::Refresh_ColorBlendState as ColorBlendState;
-pub use ffi::Refresh_ColorTarget as ColorTarget;
 pub use ffi::Refresh_ColorTargetBlendState as ColorTargetBlendState;
 pub use ffi::Refresh_ColorTargetDescription as ColorTargetDescription;
 pub use ffi::Refresh_CommandBuffer as CommandBuffer;
@@ -24,7 +23,6 @@ pub use ffi::Refresh_ComputePipeline as ComputePipeline;
 pub use ffi::Refresh_ComputePipelineCreateInfo as ComputePipelineCreateInfo;
 pub use ffi::Refresh_ComputePipelineLayoutCreateInfo as ComputePipelineLayoutCreateInfo;
 pub use ffi::Refresh_DepthStencilState as DepthStencilState;
-pub use ffi::Refresh_DepthStencilTarget as DepthStencilTarget;
 pub use ffi::Refresh_DepthStencilTargetDescription as DepthStencilTargetDescription;
 pub use ffi::Refresh_DepthStencilValue as DepthStencilValue;
 // pub type Device = ffi::Refresh_Device;
@@ -39,6 +37,7 @@ pub use ffi::Refresh_RasterizerState as RasterizerState;
 pub use ffi::Refresh_Rect as Rect;
 pub use ffi::Refresh_RenderPass as RenderPass;
 pub use ffi::Refresh_RenderPassCreateInfo as RenderPassCreateInfo;
+pub use ffi::Refresh_RenderTarget as RenderTarget;
 pub use ffi::Refresh_Sampler as Sampler;
 pub use ffi::Refresh_SamplerStateCreateInfo as SamplerStateCreateInfo;
 pub use ffi::Refresh_ShaderModule as ShaderModule;
@@ -141,30 +140,6 @@ bitflags::bitflags! {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
-pub enum ColorFormat {
-    A1R5G5B5 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_A1R5G5B5,
-    A2R10G10B10 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_A2R10G10B10,
-    B4G4R4A4 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_B4G4R4A4,
-    BC1 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_BC1,
-    BC2 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_BC2,
-    BC3 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_BC3,
-    R5G6B5 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R5G6B5,
-    R8 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R8,
-    R8G8B8A8 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8B8A8,
-    R8G8B8A8Snorm = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8B8A8_SNORM,
-    R8G8Snorm = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R8G8_SNORM,
-    R16G16 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16,
-    R16G16B16A16 = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16B16A16,
-    R16G16B16A16fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16B16A16_SFLOAT,
-    R16G16fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R16G16_SFLOAT,
-    R16fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R16_SFLOAT,
-    R32G32B32A32fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R32G32B32A32_SFLOAT,
-    R32G32fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R32G32_SFLOAT,
-    R32fFloat = ffi::Refresh_ColorFormat_REFRESH_COLORFORMAT_R32_SFLOAT,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
 pub enum CompareOp {
     Always = ffi::Refresh_CompareOp_REFRESH_COMPAREOP_ALWAYS,
     Equal = ffi::Refresh_CompareOp_REFRESH_COMPAREOP_EQUAL,
@@ -198,11 +173,30 @@ pub enum CullMode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
-pub enum DepthFormat {
-    D16Unorm = ffi::Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D16_UNORM,
-    D16UnormS8Uint = ffi::Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D16_UNORM_S8_UINT,
-    D32Sfloat = ffi::Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D32_SFLOAT,
-    D32SfloatS8Uint = ffi::Refresh_DepthFormat_REFRESH_DEPTHFORMAT_D32_SFLOAT_S8_UINT,
+pub enum TextureFormat {
+    R8G8B8A8 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8B8A8,
+    R5G6B5 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R5G6B5,
+    A1R5G5B5 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_A1R5G5B5,
+    B4G4R4A4 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_B4G4R4A4,
+    BC1 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC1,
+    BC2 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC2,
+    BC3 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_BC3,
+    R8G8Snorm = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8_SNORM,
+    R8G8B8A8Snorm = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8G8B8A8_SNORM,
+    A2R10G10B10 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_A2R10G10B10,
+    R16G16 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16,
+    R16G16B16A16 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16B16A16,
+    R8 = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R8,
+    R32Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32_SFLOAT,
+    R32G32Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32G32_SFLOAT,
+    R32G32B32A32Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R32G32B32A32_SFLOAT,
+    R16Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16_SFLOAT,
+    R16G16Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16_SFLOAT,
+    R16G16B16A16Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_R16G16B16A16_SFLOAT,
+    D16Unorm = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D16_UNORM,
+    D32Sfloat = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D32_SFLOAT,
+    D16UnormS8Uint = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D16_UNORM_S8_UINT,
+    D32SfloatS8Uint = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D32_SFLOAT_S8_UINT,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -468,7 +462,7 @@ impl DeviceDrop {
     /// * `colorCount`:	The number of colors in the above array.
     /// * `depth`:		The new value of the cleared depth buffer.
     /// * `stencil`:		The new value of the cleared stencil buffer.
-    ///
+    /// * `depth_stencil`: Depth and stencil values for the cleared depth stencil buffer.
     pub fn clear(
         &self,
         cbuf: *mut CommandBuffer,
@@ -476,8 +470,7 @@ impl DeviceDrop {
         opts: ClearOptions,
         colors: &Color,
         n_colors: u32,
-        depth: f32,
-        stencil: i32,
+        depth_stencil: DepthStencilValue,
     ) {
         unsafe {
             ffi::Refresh_Clear(
@@ -487,8 +480,7 @@ impl DeviceDrop {
                 opts.bits(),
                 colors as *const _ as *mut _,
                 n_colors,
-                depth,
-                stencil,
+                depth_stencil,
             );
         }
     }
@@ -676,52 +668,28 @@ impl Resource for Texture {
 }
 
 /// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
-pub struct ColorTargetCreateInfo {
-    pub multi_sample_count: SampleCount,
+pub struct RenderTargetCreateInfo {
     pub texture_slice: *mut TextureSlice,
+    pub multi_sample_count: SampleCount,
 }
 
-impl Resource for ColorTarget {
-    type CreateInfo = ColorTargetCreateInfo;
+impl Resource for RenderTarget {
+    type CreateInfo = RenderTargetCreateInfo;
 
     /// Note that the contents of * the texture are undefined until SetData is called.
     fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
         unsafe {
-            ffi::Refresh_CreateColorTarget(
+            ffi::Refresh_CreateRenderTarget(
                 device.raw,
-                info.multi_sample_count as u32,
                 info.texture_slice,
+                info.multi_sample_count as u32,
             )
         }
     }
 
     fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
         unsafe {
-            ffi::Refresh_QueueDestroyColorTarget(device.raw, me);
-        }
-    }
-}
-
-/// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
-pub struct DepthStencilTargetCreateInfo {
-    pub w: u32,
-    pub h: u32,
-    pub format: DepthFormat,
-}
-
-impl Resource for DepthStencilTarget {
-    type CreateInfo = DepthStencilTargetCreateInfo;
-
-    /// Note that the contents of * the texture are undefined until SetData is called.
-    fn create(device: &DeviceDrop, info: &Self::CreateInfo) -> *mut Self {
-        unsafe {
-            ffi::Refresh_CreateDepthStencilTarget(device.raw, info.w, info.h, info.format as u32)
-        }
-    }
-
-    fn queue_destroy(me: *mut Self, device: &DeviceDrop) {
-        unsafe {
-            ffi::Refresh_QueueDestroyDepthStencilTarget(device.raw, me);
+            ffi::Refresh_QueueDestroyRenderTarget(device.raw, me);
         }
     }
 }
@@ -944,7 +912,7 @@ impl DeviceDrop {
         cbuf: *mut CommandBuffer,
         rpass: *mut RenderPass,
         fbuf: *mut Framebuffer,
-        area: Rect,
+        area: &Rect,
         clear: Option<&[Color]>,
         depth_stencil_clear_value: &DepthStencilValue,
     ) {
@@ -958,7 +926,7 @@ impl DeviceDrop {
                 cbuf,
                 rpass,
                 fbuf,
-                area,
+                area as *const _ as *mut _,
                 ptr,
                 len,
                 depth_stencil_clear_value as *const _ as *mut _,
