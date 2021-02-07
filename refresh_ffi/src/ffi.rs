@@ -3831,27 +3831,27 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn Refresh_PushVertexShaderParams(
+    pub fn Refresh_PushVertexShaderUniforms(
         device: *mut Refresh_Device,
-        commandBuffer: *mut Refresh_CommandBuffer,
+        pipeline: *mut Refresh_GraphicsPipeline,
         data: *mut ::std::os::raw::c_void,
-        paramBlockCount: u32,
+        dataLengthInBytes: u32,
     ) -> u32;
 }
 extern "C" {
-    pub fn Refresh_PushFragmentShaderParams(
+    pub fn Refresh_PushFragmentShaderUniforms(
         device: *mut Refresh_Device,
-        commandBuffer: *mut Refresh_CommandBuffer,
+        pipeline: *mut Refresh_GraphicsPipeline,
         data: *mut ::std::os::raw::c_void,
-        paramBlockCount: u32,
+        dataLengthInBytes: u32,
     ) -> u32;
 }
 extern "C" {
-    pub fn Refresh_PushComputeShaderParams(
+    pub fn Refresh_PushComputeShaderUniforms(
         device: *mut Refresh_Device,
-        commandBuffer: *mut Refresh_CommandBuffer,
+        pipeline: *mut Refresh_ComputePipeline,
         data: *mut ::std::os::raw::c_void,
-        paramBlockCount: u32,
+        dataLengthInBytes: u32,
     ) -> u32;
 }
 extern "C" {

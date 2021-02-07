@@ -825,17 +825,14 @@ impl DeviceDrop {
     /// NOTE:
     /// 		A pipeline must be bound.
     /// 		Will use the block size of the currently bound vertex shader.
-    ///
-    /// * `data`: 				The client data to write into the buffer.
-    /// * `param_block_count`: 	The number of param-sized blocks from the client buffer to write.
-    pub fn push_vertex_shader_params(
-        &self,
-        cbuf: *mut CommandBuffer,
-        data_ptr: *mut c_void,
-        param_block_count: u32,
-    ) {
+    pub fn push_vertex_shader_params(&self, pip: *mut GraphicsPipeline, data: &[u8]) {
         unsafe {
-            ffi::Refresh_PushVertexShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+            ffi::Refresh_PushVertexShaderUniforms(
+                self.raw,
+                pip,
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
         }
     }
 
@@ -845,17 +842,14 @@ impl DeviceDrop {
     /// NOTE:
     /// 		A graphics pipeline must be bound.
     /// 		Will use the block size of the currently bound fragment shader.
-    ///
-    /// * `data`: 				The client data to write into the buffer.
-    /// * `param_block_count`: 	The number of param-sized blocks from the client buffer to write.
-    pub fn push_fragment_shader_params(
-        &self,
-        cbuf: *mut CommandBuffer,
-        data_ptr: *mut c_void,
-        param_block_count: u32,
-    ) {
+    pub fn push_fragment_shader_params(&self, pip: *mut GraphicsPipeline, data: &[u8]) {
         unsafe {
-            ffi::Refresh_PushFragmentShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+            ffi::Refresh_PushFragmentShaderUniforms(
+                self.raw,
+                pip,
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
         }
     }
 
@@ -865,17 +859,14 @@ impl DeviceDrop {
     /// NOTE:
     /// 	A compute pipeline must be bound.
     /// 	Will use the block size of the currently bound compute shader.
-    ///
-    /// * `data`:			The client data to write into the buffer.
-    /// * `param_block_data`:	The number of param-sized blocks from the client buffer to write.
-    pub fn push_compute_shader_params(
-        &self,
-        cbuf: *mut CommandBuffer,
-        data_ptr: *mut c_void,
-        param_block_count: u32,
-    ) {
+    pub fn push_compute_shader_params(&self, pip: *mut ComputePipeline, data: &[u8]) {
         unsafe {
-            ffi::Refresh_PushComputeShaderParams(self.raw, cbuf, data_ptr, param_block_count);
+            ffi::Refresh_PushComputeShaderUniforms(
+                self.raw,
+                pip,
+                data.as_ptr() as *const _ as *mut _,
+                data.len() as u32,
+            );
         }
     }
 }
