@@ -14,7 +14,6 @@ use std::{ops::Deref, os::raw::c_void, rc::Rc};
 // structs
 
 pub use ffi::Refresh_Buffer as Buffer;
-pub use ffi::Refresh_Color as Color;
 pub use ffi::Refresh_ColorBlendState as ColorBlendState;
 pub use ffi::Refresh_ColorTargetBlendState as ColorTargetBlendState;
 pub use ffi::Refresh_ColorTargetDescription as ColorTargetDescription;
@@ -49,6 +48,7 @@ pub use ffi::Refresh_Texture as Texture;
 pub use ffi::Refresh_TextureCreateInfo as TextureCreateInfo;
 pub use ffi::Refresh_TextureHandles as TextureHandles;
 pub use ffi::Refresh_TextureSlice as TextureSlice;
+/// Represents color
 pub use ffi::Refresh_Vec4 as Vec4;
 pub use ffi::Refresh_VertexAttribute as VertexAttribute;
 pub use ffi::Refresh_VertexBinding as VertexBinding;
@@ -468,7 +468,7 @@ impl DeviceDrop {
         cbuf: *mut CommandBuffer,
         rect: &Rect,
         opts: ClearOptions,
-        colors: &Color,
+        colors: &Vec4,
         n_colors: u32,
         depth_stencil: DepthStencilValue,
     ) {
@@ -904,7 +904,7 @@ impl DeviceDrop {
         rpass: *mut RenderPass,
         fbuf: *mut Framebuffer,
         area: &Rect,
-        clear: Option<&[Color]>,
+        clear: Option<&[Vec4]>,
         depth_stencil_clear_value: &DepthStencilValue,
     ) {
         let (ptr, len) = match clear {

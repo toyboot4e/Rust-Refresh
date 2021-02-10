@@ -977,67 +977,6 @@ pub const Refresh_BorderColor_REFRESH_BORDERCOLOR_INT_OPAQUE_WHITE: Refresh_Bord
 pub type Refresh_BorderColor = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct Refresh_Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-    pub a: u8,
-}
-#[test]
-fn bindgen_test_layout_Refresh_Color() {
-    assert_eq!(
-        ::std::mem::size_of::<Refresh_Color>(),
-        4usize,
-        concat!("Size of: ", stringify!(Refresh_Color))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<Refresh_Color>(),
-        1usize,
-        concat!("Alignment of ", stringify!(Refresh_Color))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Refresh_Color>())).r as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Refresh_Color),
-            "::",
-            stringify!(r)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Refresh_Color>())).g as *const _ as usize },
-        1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Refresh_Color),
-            "::",
-            stringify!(g)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Refresh_Color>())).b as *const _ as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Refresh_Color),
-            "::",
-            stringify!(b)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Refresh_Color>())).a as *const _ as usize },
-        3usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Refresh_Color),
-            "::",
-            stringify!(a)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct Refresh_DepthStencilValue {
     pub depth: f32,
     pub stencil: u32,
@@ -3678,7 +3617,7 @@ extern "C" {
         commandBuffer: *mut Refresh_CommandBuffer,
         clearRect: *mut Refresh_Rect,
         options: Refresh_ClearOptions,
-        colors: *mut Refresh_Color,
+        colors: *mut Refresh_Vec4,
         colorCount: u32,
         depthStencil: Refresh_DepthStencilValue,
     );
@@ -3914,7 +3853,7 @@ extern "C" {
         renderPass: *mut Refresh_RenderPass,
         framebuffer: *mut Refresh_Framebuffer,
         renderArea: *mut Refresh_Rect,
-        pColorClearValues: *mut Refresh_Color,
+        pColorClearValues: *mut Refresh_Vec4,
         colorClearCount: u32,
         depthStencilClearValue: *mut Refresh_DepthStencilValue,
     );
