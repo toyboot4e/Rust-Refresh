@@ -1,23 +1,25 @@
 /*!
+Rust bindings to [Refresh]
 
-Wrapper of Refresh
-
+[Refresh]: https://github.com/thatcosmonaut/Refresh
 */
 
 pub mod img;
 
 pub use refresh_ffi as ffi;
 
-use std::{ops::Deref, os::raw::c_void, rc::Rc};
+use std::{ops::Deref, rc::Rc};
 
 // --------------------------------------------------------------------------------
 // structs
 
+/// [`Resource`] type
 pub use ffi::Refresh_Buffer as Buffer;
 pub use ffi::Refresh_ColorBlendState as ColorBlendState;
 pub use ffi::Refresh_ColorTargetBlendState as ColorTargetBlendState;
 pub use ffi::Refresh_ColorTargetDescription as ColorTargetDescription;
 pub use ffi::Refresh_CommandBuffer as CommandBuffer;
+/// [`Resource`] type
 pub use ffi::Refresh_ComputePipeline as ComputePipeline;
 pub use ffi::Refresh_ComputePipelineCreateInfo as ComputePipelineCreateInfo;
 pub use ffi::Refresh_ComputePipelineLayoutCreateInfo as ComputePipelineLayoutCreateInfo;
@@ -34,16 +36,21 @@ pub use ffi::Refresh_MultisampleState as MultisampleState;
 pub use ffi::Refresh_PresentationParameters as PresentationParameters;
 pub use ffi::Refresh_RasterizerState as RasterizerState;
 pub use ffi::Refresh_Rect as Rect;
+/// [`Resource`] type
 pub use ffi::Refresh_RenderPass as RenderPass;
 pub use ffi::Refresh_RenderPassCreateInfo as RenderPassCreateInfo;
+/// [`Resource`] type
 pub use ffi::Refresh_RenderTarget as RenderTarget;
+/// [`Resource`] type
 pub use ffi::Refresh_Sampler as Sampler;
 pub use ffi::Refresh_SamplerStateCreateInfo as SamplerStateCreateInfo;
+/// [`Resource`] type
 pub use ffi::Refresh_ShaderModule as ShaderModule;
 pub use ffi::Refresh_ShaderModuleCreateInfo as ShaderModuleCreateInfo;
 pub use ffi::Refresh_ShaderStageState as ShaderStageState;
 pub use ffi::Refresh_StencilOpState as StencilOpState;
 pub use ffi::Refresh_SysRenderer as SysRenderer;
+/// [`Resource`] type
 pub use ffi::Refresh_Texture as Texture;
 pub use ffi::Refresh_TextureCreateInfo as TextureCreateInfo;
 pub use ffi::Refresh_TextureHandles as TextureHandles;
@@ -92,12 +99,13 @@ pub enum BlendFactor {
     Zero = ffi::Refresh_BlendFactor_REFRESH_BLENDFACTOR_ZERO,
 }
 
+/// Add | Max | Min ~ ReverseSubstract | Substract
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum BlendOp {
-    ADD = ffi::Refresh_BlendOp_REFRESH_BLENDOP_ADD,
-    MAX = ffi::Refresh_BlendOp_REFRESH_BLENDOP_MAX,
-    MIN = ffi::Refresh_BlendOp_REFRESH_BLENDOP_MIN,
+    Add = ffi::Refresh_BlendOp_REFRESH_BLENDOP_ADD,
+    Max = ffi::Refresh_BlendOp_REFRESH_BLENDOP_MAX,
+    Min = ffi::Refresh_BlendOp_REFRESH_BLENDOP_MIN,
     ReverseSubtract = ffi::Refresh_BlendOp_REFRESH_BLENDOP_REVERSE_SUBTRACT,
     Substract = ffi::Refresh_BlendOp_REFRESH_BLENDOP_SUBTRACT,
 }
@@ -114,14 +122,16 @@ pub enum BorderColor {
 }
 
 bitflags::bitflags! {
+    /// COMPUTE | INDEX | VERTEX (bitflags)
     pub struct BufferUsageFlags: u32 {
-        const COMPUTE_BIT = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_COMPUTE_BIT;
-        const INDEX_BIT = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_INDEX_BIT;
-        const VERTEX_BIT = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_VERTEX_BIT;
+        const COMPUTE = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_COMPUTE_BIT;
+        const INDEX = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_INDEX_BIT;
+        const VERTEX = ffi::Refresh_BufferUsageFlagBits_REFRESH_BUFFERUSAGE_VERTEX_BIT;
     }
 }
 
 bitflags::bitflags! {
+    /// Color | Depth | Stencil (bitflags)
     pub struct ClearOptions: u32 {
         const COLOR	= ffi::Refresh_ClearOptionsBits_REFRESH_CLEAROPTIONS_COLOR;
         const DEPTH	= ffi::Refresh_ClearOptionsBits_REFRESH_CLEAROPTIONS_DEPTH;
@@ -130,11 +140,12 @@ bitflags::bitflags! {
 }
 
 bitflags::bitflags! {
+    /// A | B | G | R (bitflags)
     pub struct ColorComponentFlags: u32 {
-        const A_BIT	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_A_BIT;
-        const B_BIT	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_B_BIT;
-        const G_BIT	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_G_BIT;
-        const R_BIT = ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_R_BIT;
+        const A	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_A_BIT;
+        const B	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_B_BIT;
+        const G	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_G_BIT;
+        const R = ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_R_BIT;
     }
 }
 
@@ -151,6 +162,7 @@ pub enum CompareOp {
     NotEqual = ffi::Refresh_CompareOp_REFRESH_COMPAREOP_NOT_EQUAL,
 }
 
+/// Nevative/Positive X | Y | Z
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum CubeMapFace {
@@ -162,6 +174,7 @@ pub enum CubeMapFace {
     PositiveZ = ffi::Refresh_CubeMapFace_REFRESH_CUBEMAPFACE_POSITIVEZ,
 }
 
+/// Back | Front | FrontAndBack | None
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum CullMode {
@@ -199,6 +212,7 @@ pub enum TextureFormat {
     D32SfloatS8Uint = ffi::Refresh_TextureFormat_REFRESH_TEXTUREFORMAT_D32_SFLOAT_S8_UINT,
 }
 
+/// Fill | Line | Point
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum FillMode {
@@ -207,6 +221,7 @@ pub enum FillMode {
     Point = ffi::Refresh_FillMode_REFRESH_FILLMODE_POINT,
 }
 
+/// Cubic | Linear | Nearest
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Filter {
@@ -215,6 +230,7 @@ pub enum Filter {
     Nearest = ffi::Refresh_Filter_REFRESH_FILTER_NEAREST,
 }
 
+/// Clockwise | CounterClocwkise
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum FrontFace {
@@ -222,6 +238,7 @@ pub enum FrontFace {
     CounterClockwise = ffi::Refresh_FrontFace_REFRESH_FRONTFACE_COUNTER_CLOCKWISE,
 }
 
+/// Bit16 | Bit32
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum IndexElementSize {
@@ -229,6 +246,7 @@ pub enum IndexElementSize {
     Bit32 = ffi::Refresh_IndexElementSize_REFRESH_INDEXELEMENTSIZE_32BIT,
 }
 
+/// Clear | DontCare | Load
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum LoadOp {
@@ -258,6 +276,7 @@ pub enum LogicOp {
     Xor = ffi::Refresh_LogicOp_REFRESH_LOGICOP_XOR,
 }
 
+/// Fifo | FifoRelaxed | Immediate | Mailbox
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum PresentMode {
@@ -267,16 +286,18 @@ pub enum PresentMode {
     Mailbox = ffi::Refresh_PresentMode_REFRESH_PRESENTMODE_MAILBOX,
 }
 
+/// LineList | LineStrip | PointList | TriangleList | TriangleStrip
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum PrimitiveType {
-    Linelist = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_LINELIST,
-    Linestrip = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_LINESTRIP,
-    Pointlist = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_POINTLIST,
-    Trianglelist = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_TRIANGLELIST,
-    Trianglestrip = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_TRIANGLESTRIP,
+    LineList = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_LINELIST,
+    LineStrip = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_LINESTRIP,
+    PointList = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_POINTLIST,
+    TriangleList = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_TRIANGLELIST,
+    TriangleStrip = ffi::Refresh_PrimitiveType_REFRESH_PRIMITIVETYPE_TRIANGLESTRIP,
 }
 
+//// N1, 2, .. 64
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum SampleCount {
@@ -289,6 +310,7 @@ pub enum SampleCount {
     N64 = ffi::Refresh_SampleCount_REFRESH_SAMPLECOUNT_64,
 }
 
+/// ClampToBorder | ClampToEdge | MirroedRepeat | repeat
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum SamplerAddressMode {
@@ -298,6 +320,7 @@ pub enum SamplerAddressMode {
     Repeat = ffi::Refresh_SamplerAddressMode_REFRESH_SAMPLERADDRESSMODE_REPEAT,
 }
 
+/// Linear | Nearest
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum SamplerMipmapMode {
@@ -305,6 +328,7 @@ pub enum SamplerMipmapMode {
     Nearest = ffi::Refresh_SamplerMipmapMode_REFRESH_SAMPLERMIPMAPMODE_NEAREST,
 }
 
+/// Fragment | Vertex
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum ShaderStageType {
@@ -325,6 +349,7 @@ pub enum StencilOp {
     Zero = ffi::Refresh_StencilOp_REFRESH_STENCILOP_ZERO,
 }
 
+/// DontCare | Store
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum StoreOp {
@@ -332,6 +357,7 @@ pub enum StoreOp {
     Store = ffi::Refresh_StoreOp_REFRESH_STOREOP_STORE,
 }
 
+/// Vulkan
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum SysRenderType {
@@ -339,9 +365,10 @@ pub enum SysRenderType {
 }
 
 bitflags::bitflags! {
+    /// COLOR_TARGET | SAMPLER (bitflags)
     pub struct TextureUsageFlags: u32 {
-        const COLOR_TARGET_BIT = ffi::Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_COLOR_TARGET_BIT;
-        const SAMPLER_BIT = ffi::Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_SAMPLER_BIT;
+        const COLOR_TARGET = ffi::Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_COLOR_TARGET_BIT;
+        const SAMPLER = ffi::Refresh_TextureUsageFlagBits_REFRESH_TEXTUREUSAGE_SAMPLER_BIT;
     }
 }
 
@@ -364,6 +391,7 @@ pub enum VertexElementFormat {
     Vector4 = ffi::Refresh_VertexElementFormat_REFRESH_VERTEXELEMENTFORMAT_VECTOR4,
 }
 
+/// Instance | Vertex
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum VertexInputRate {
@@ -387,6 +415,7 @@ pub fn hook_log_functions(info: LogFunc, warn: LogFunc, error: LogFunc) {
     }
 }
 
+/// Reference-counted ownership of [`DeviceDrop`]
 #[derive(Debug, Clone)]
 pub struct Device {
     inner: Rc<DeviceDrop>,
@@ -406,6 +435,7 @@ impl Deref for Device {
     }
 }
 
+/// Ownership of Refresh device
 #[derive(Debug)]
 pub struct DeviceDrop {
     raw: *mut ffi::Refresh_Device,
@@ -556,6 +586,7 @@ impl DeviceDrop {
     }
 }
 
+/// Create/destory
 pub trait Resource {
     type CreateInfo;
 
@@ -667,7 +698,7 @@ impl Resource for Texture {
     }
 }
 
-/// (Non-Refresh) Additional type to Refresh for [`Resource`] crate
+/// (Non-Refresh) Additional type to Refresh for [`Resource`] trait
 pub struct RenderTargetCreateInfo {
     pub texture_slice: *mut TextureSlice,
     pub multi_sample_count: SampleCount,
