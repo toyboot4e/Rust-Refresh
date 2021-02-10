@@ -39,7 +39,7 @@ pub use ffi::Refresh_Rect as Rect;
 /// [`Resource`] type
 pub use ffi::Refresh_RenderPass as RenderPass;
 pub use ffi::Refresh_RenderPassCreateInfo as RenderPassCreateInfo;
-/// [`Resource`] type
+/// [`Resource`] type. Color or depth/stencil target
 pub use ffi::Refresh_RenderTarget as RenderTarget;
 /// [`Resource`] type
 pub use ffi::Refresh_Sampler as Sampler;
@@ -140,12 +140,16 @@ bitflags::bitflags! {
 }
 
 bitflags::bitflags! {
-    /// A | B | G | R (bitflags)
-    pub struct ColorComponentFlags: u32 {
-        const A	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_A_BIT;
-        const B	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_B_BIT;
-        const G	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_G_BIT;
+    /// R | G | B | A(bitflags)
+    pub struct ColorComponent: u32 {
         const R = ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_R_BIT;
+        const G	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_G_BIT;
+        const B	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_B_BIT;
+        const A	= ffi::Refresh_ColorComponentFlagBits_REFRESH_COLORCOMPONENT_A_BIT;
+        // 1 + 2 + 4
+        const RGB = 7;
+        // 1 + 2 + 4 + 8
+        const RGBA = 15;
     }
 }
 
@@ -422,6 +426,12 @@ pub struct Device {
 }
 
 impl Device {
+    pub fn new(params: &PresentationParameters, is_debug: bool) -> Self {
+        Self {
+            inner: Rc::new(DeviceDrop::new(params, is_debug)),
+        }
+    }
+
     pub fn from_drop(d: DeviceDrop) -> Self {
         Self { inner: Rc::new(d) }
     }
@@ -489,7 +499,6 @@ impl DeviceDrop {
     /// * `clearRect`:	Area to clear.
     /// * `options`:		Bitflags to specify color/depth/stencil buffers for clearing.
     /// * `colors`:		An array of color values for the cleared color buffers.
-    /// * `colorCount`:	The number of colors in the above array.
     /// * `depth`:		The new value of the cleared depth buffer.
     /// * `stencil`:		The new value of the cleared stencil buffer.
     /// * `depth_stencil`: Depth and stencil values for the cleared depth stencil buffer.
@@ -498,8 +507,7 @@ impl DeviceDrop {
         cbuf: *mut CommandBuffer,
         rect: &Rect,
         opts: ClearOptions,
-        colors: &Vec4,
-        n_colors: u32,
+        colors: &[Vec4],
         depth_stencil: DepthStencilValue,
     ) {
         unsafe {
@@ -508,8 +516,12 @@ impl DeviceDrop {
                 cbuf,
                 rect as *const _ as *mut _,
                 opts.bits(),
-                colors as *const _ as *mut _,
-                n_colors,
+                if colors.len() != 0 {
+                    colors.as_ptr() as *const _ as *mut _
+                } else {
+                    std::ptr::null_mut()
+                },
+                colors.len() as _,
                 depth_stencil,
             );
         }
@@ -669,6 +681,7 @@ impl Resource for Framebuffer {
     }
 }
 
+// TODO: ShaderModuleCreateInfo is actually &[u8] and should be easier to use
 impl Resource for ShaderModule {
     type CreateInfo = ShaderModuleCreateInfo;
 
@@ -751,11 +764,11 @@ impl Resource for Buffer {
 /// Setters
 impl DeviceDrop {
     /// Uploads image data to a texture object.
-    pub fn set_texture_data(&self, slice: *mut TextureSlice, data: &[u8]) {
+    pub fn set_texture_data(&self, slice: &TextureSlice, data: &[u8]) {
         unsafe {
             ffi::Refresh_SetTextureData(
                 self.raw,
-                slice,
+                slice as *const _ as *mut _,
                 data.as_ptr() as *const _ as *mut _,
                 data.len() as u32,
             );
@@ -1091,7 +1104,7 @@ impl DeviceDrop {
     /// 	A command buffer may only be used on the thread that
     /// 	it was acquired on. Using it on any other thread is an error.
     ///
-    /// * `fixed`:
+    /// * `is_fixed`:
     /// 	If a command buffer is designated as fixed, it can be
     /// 	acquired once, have commands recorded into it, and
     /// 	be re-submitted indefinitely.

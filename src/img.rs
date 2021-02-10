@@ -18,6 +18,7 @@ pub struct Image {
 }
 
 impl Image {
+    /// TODO: fail?
     pub fn load_name(name: &CStr) -> Self {
         let (mut w, mut h, mut n_channels) = (0u32, 0u32, 0u32);
 
